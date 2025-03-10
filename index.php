@@ -6,7 +6,7 @@ $fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');          // Fecha de fin por de
 
 // Función para obtener los gastos dentro de un rango de fechas
 function obtenerGastos($conexion, $fechaInicio, $fechaFin) {
-    $sql = "SELECT * FROM gastos WHERE fecha BETWEEN '$fechaInicio' AND '$fechaFin'";
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
@@ -18,7 +18,7 @@ $gastos = obtenerGastos($conexion, $fechaInicio, $fechaFin);
 function calcularTotal($gastos) {
     $total = 0;
     foreach ($gastos as $gasto) {
-        $total += $gasto['monto'];
+        $total += $gasto['Monto'];
     }
     return $total;
 }
@@ -79,11 +79,11 @@ $totalGastos = calcularTotal($gastos);
                 <?php if (count($gastos) > 0): ?>
                     <?php foreach ($gastos as $gasto): ?>
                         <tr>
-                            <td><?php echo $gasto['descripcion']; ?></td>
-                            <td>$<?php echo number_format($gasto['monto'], 2); ?></td>
-                            <td><?php echo $gasto['fecha']; ?></td>
+                            <td><?php echo $gasto['Descripcion']; ?></td>
+                            <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
+                            <td><?php echo $gasto['Fecha']; ?></td>
                             <td>
-                                <a href="eliminar_gasto.php?id=<?php echo $gasto['id']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
+                                <a href="deleteExpenses.php" class="btn btn-danger btn-sm">Eliminar</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -96,7 +96,7 @@ $totalGastos = calcularTotal($gastos);
         </table>
 
         <!-- Agregar gasto -->
-        <a href="agregar_gasto.php" class="btn btn-success mt-3">Agregar Nuevo Gasto</a>
+        <a href="addExpenses.php" class="btn btn-success mt-3">Agregar Nuevo Gasto</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

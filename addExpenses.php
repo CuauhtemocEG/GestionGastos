@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $monto = $_POST['monto'];
     $fecha = $_POST['fecha'];
 
-    $sql = "INSERT INTO gastos (descripcion, monto, fecha) VALUES ('$descripcion', '$monto', '$fecha')";
+    $sql = "INSERT INTO Gastos (Descripcion, Monto, Fecha) VALUES ('$descripcion', '$monto', '$fecha')";
 
     if ($conexion->query($sql) === TRUE) {
         header('Location: index.php');
