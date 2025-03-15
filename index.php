@@ -83,7 +83,7 @@ $totalGastos = calcularTotal($gastos);
                             <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
                             <td><?php echo $gasto['Fecha']; ?></td>
                             <td>
-                                <a href="deleteExpenses.php?id=<?php echo $gasto;?>" class="btn btn-danger btn-sm">Eliminar</a>
+                                <a href="deleteExpenses.php?id=<?php echo $gasto['id'];?>" class="btn btn-danger btn-sm">Eliminar</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
