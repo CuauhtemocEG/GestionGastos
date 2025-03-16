@@ -38,18 +38,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="number" class="form-control" id="monto" name="monto" required>
             </div>
             <div class="mb-3">
+                <label for="typeExpense" class="form-label">Medio de Pago</label>
+                <select name="typeExpense">
+                    <option>Pago con Tarjeta</option>
+                    <option>Efectivo</option>
+                </select>
+            </div>
+            <div class="mb-3">
                 <label for="fecha" class="form-label">Fecha</label>
                 <input type="date" class="form-control" id="fecha" name="fecha" required>
             </div>
             <button type="submit" class="btn btn-primary">Guardar Gasto</button>
         </form>
     </div>
-
-    <label>Pago Tarjeta</label>
-    <input type="text">
-    <br>
-    <label>Pago Efectivo</label>
-    <input type="text">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
