@@ -202,7 +202,7 @@ $totalGastosAll = calcularTotales($gastosTotales);
                 </ul>
 
                 <!-- Mostrar los gastos Efectivo-->
-                <h3>Lista de Gastos con Efectivo</h3>
+                <h3>Lista de Gastos Totales</h3>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
