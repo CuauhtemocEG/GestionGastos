@@ -70,6 +70,7 @@ $totalGastos = calcularTotal($gastos);
             <thead>
                 <tr>
                     <th>Descripción</th>
+                    <th>Método de Pago</th>
                     <th>Monto</th>
                     <th>Fecha</th>
                     <th>Acciones</th>
@@ -80,6 +81,7 @@ $totalGastos = calcularTotal($gastos);
                     <?php foreach ($gastos as $gasto): ?>
                         <tr>
                             <td><?php echo $gasto['Descripcion']; ?></td>
+                            <td><?php echo $gasto['Metodo']; ?></td>
                             <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
                             <td><?php echo $gasto['Fecha']; ?></td>
                             <td>
