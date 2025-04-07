@@ -77,7 +77,7 @@ $totalGastosEfectivo = calcularTotalEfectivo($gastosEfectivo);
         </form>
 
         <!-- Resumen de gastos -->
-        <h3>Resumen de Gastos</h3>
+        <h3>Resumen de Gastos con Tarjeta</h3>
         <ul class="list-group mb-4">
             <li class="list-group-item">
                 <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastos, 2); ?>
@@ -118,15 +118,7 @@ $totalGastosEfectivo = calcularTotalEfectivo($gastosEfectivo);
         </table>
 
         <!-- Resumen de gastos -->
-        <h3>Resumen de Gastos</h3>
-        <ul class="list-group mb-4">
-            <li class="list-group-item">
-                <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastos, 2); ?>
-            </li>
-        </ul>
-
-        <!-- Resumen de gastos -->
-        <h3>Resumen de Gastos</h3>
+        <h3>Resumen de Gastos en Efectivo</h3>
         <ul class="list-group mb-4">
             <li class="list-group-item">
                 <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastos, 2); ?>
