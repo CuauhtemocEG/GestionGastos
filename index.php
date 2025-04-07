@@ -105,6 +105,50 @@ $totalGastosAll = calcularTotales($gastosTotales);
             </div>
         </form>
         <br>
+        <!-- Collapse -->
+        <p>
+            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseFijo" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Gasto Fijo
+            </a>
+            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseCentral" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Central de Abasto
+            </a>
+            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseSitio" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Gasto en Sitio
+            </a>
+            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseMantenimiento" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Gasto de Mantenimiento
+            </a>
+            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseInversiones" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Inversiones
+            </a>
+        </p>
+        <div class="collapse" id="collapseFijo">
+            <div class="card card-body">
+                Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+            </div>
+        </div>
+        <div class="collapse" id="collapseCentral">
+            <div class="card card-body">
+                Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+            </div>
+        </div>
+        <div class="collapse" id="collapseSitio">
+            <div class="card card-body">
+                Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+            </div>
+        </div>
+        <div class="collapse" id="collapseMantenimiento">
+            <div class="card card-body">
+                Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+            </div>
+        </div>
+        <div class="collapse" id="collapseInversiones">
+            <div class="card card-body">
+                Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-6">
                 <!-- Resumen de gastos -->
@@ -195,44 +239,44 @@ $totalGastosAll = calcularTotales($gastosTotales);
         <hr>
         <!-- Resumen de gastos -->
         <h3>Resumen de Gastos Totales</h3>
-                <ul class="list-group mb-4">
-                    <li class="list-group-item">
-                        <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastosAll, 2); ?>
-                    </li>
-                </ul>
+        <ul class="list-group mb-4">
+            <li class="list-group-item">
+                <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastosAll, 2); ?>
+            </li>
+        </ul>
 
-                <!-- Mostrar los gastos Efectivo-->
-                <h3>Lista de Gastos Totales</h3>
-                <table class="table table-bordered">
-                    <thead>
+        <!-- Mostrar los gastos Efectivo-->
+        <h3>Lista de Gastos Totales</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Método de Pago</th>
+                    <th>Monto</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (count($gastosTotales) > 0): ?>
+                    <?php foreach ($gastosTotales as $gasto): ?>
                         <tr>
-                            <th>Descripción</th>
-                            <th>Método de Pago</th>
-                            <th>Monto</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
+                            <td><?php echo $gasto['Descripcion']; ?></td>
+                            <td><?php echo $gasto['Metodo']; ?></td>
+                            <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
+                            <td><?php echo $gasto['Fecha']; ?></td>
+                            <td>
+                                <a href="deleteExpenses.php?id=<?php echo $gasto['ID']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (count($gastosTotales) > 0): ?>
-                            <?php foreach ($gastosTotales as $gasto): ?>
-                                <tr>
-                                    <td><?php echo $gasto['Descripcion']; ?></td>
-                                    <td><?php echo $gasto['Metodo']; ?></td>
-                                    <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
-                                    <td><?php echo $gasto['Fecha']; ?></td>
-                                    <td>
-                                        <a href="deleteExpenses.php?id=<?php echo $gasto['ID']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4" class="text-center">No hay gastos registrados en este rango de fechas.</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
 
         <!-- Agregar gasto -->
         <a href="addExpenses.php" class="btn btn-success mt-3">Agregar Nuevo Gasto</a>
