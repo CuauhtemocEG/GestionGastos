@@ -95,7 +95,7 @@ function obtenerGastosCentral($conexion, $fechaInicio, $fechaFin)
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
 
-$gastosTotalesCentral = obtenerGastosFijos($conexion, $fechaInicio, $fechaFin);
+$gastosTotalesCentral = obtenerGastosCentral($conexion, $fechaInicio, $fechaFin);
 
 function calcularTotalesCentral($gastosTotalesCentral)
 {
