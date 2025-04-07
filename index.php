@@ -6,13 +6,23 @@ $fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');          // Fecha de fin por de
 
 // Función para obtener los gastos dentro de un rango de fechas
 function obtenerGastos($conexion, $fechaInicio, $fechaFin) {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin'";
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Metodo='Tarjeta'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
 
 // Obtener los gastos
 $gastos = obtenerGastos($conexion, $fechaInicio, $fechaFin);
+
+// Función para obtener los gastos dentro de un rango de fechas
+function obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin) {
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Metodo='Efectivo'";
+    $resultado = $conexion->query($sql);
+    return $resultado->fetch_all(MYSQLI_ASSOC);
+}
+
+// Obtener los gastos
+$gastosEfectivo = obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin);
 
 // Función para calcular el total de los gastos
 function calcularTotal($gastos) {
@@ -23,7 +33,17 @@ function calcularTotal($gastos) {
     return $total;
 }
 
+// Función para calcular el total de los gastos
+function calcularTotalEfectivo($gastosEfectivo) {
+    $total = 0;
+    foreach ($gastosEfectivo as $gastoEfectivo) {
+        $total += $gastoEfectivo['Monto'];
+    }
+    return $total;
+}
+
 $totalGastos = calcularTotal($gastos);
+$totalGastosEfectivo = calcularTotalEfectivo($gastosEfectivo);
 ?>
 
 <!DOCTYPE html>
@@ -36,7 +56,7 @@ $totalGastos = calcularTotal($gastos);
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="text-center">Prueba de form May</h1>
+        <h1 class="text-center">Gestión de Gastos</h1>
 
         <!-- Filtro de fechas -->
         <form action="index.php" method="GET">
@@ -64,8 +84,57 @@ $totalGastos = calcularTotal($gastos);
             </li>
         </ul>
 
-        <!-- Mostrar los gastos -->
-        <h3>Lista de Gastos</h3>
+        <!-- Mostrar los gastos Tarjeta-->
+        <h3>Lista de Gastos con Tarjeta</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Método de Pago</th>
+                    <th>Monto</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (count($gastos) > 0): ?>
+                    <?php foreach ($gastos as $gasto): ?>
+                        <tr>
+                            <td><?php echo $gasto['Descripcion']; ?></td>
+                            <td><?php echo $gasto['Metodo']; ?></td>
+                            <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
+                            <td><?php echo $gasto['Fecha']; ?></td>
+                            <td>
+                                <a href="deleteExpenses.php?id=<?php echo $gasto['ID'];?>" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4" class="text-center">No hay gastos registrados en este rango de fechas.</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+
+        <!-- Resumen de gastos -->
+        <h3>Resumen de Gastos</h3>
+        <ul class="list-group mb-4">
+            <li class="list-group-item">
+                <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastos, 2); ?>
+            </li>
+        </ul>
+
+        <!-- Resumen de gastos -->
+        <h3>Resumen de Gastos</h3>
+        <ul class="list-group mb-4">
+            <li class="list-group-item">
+                <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastos, 2); ?>
+            </li>
+        </ul>
+
+        <!-- Mostrar los gastos Efectivo-->
+        <h3>Lista de Gastos con Efectivo</h3>
         <table class="table table-bordered">
             <thead>
                 <tr>
