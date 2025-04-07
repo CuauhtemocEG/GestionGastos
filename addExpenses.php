@@ -6,8 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $monto = $_POST['monto'];
     $fecha = $_POST['fecha'];
     $method = $_POST['typeExpense'];
+    $tipoGasto = $_POST['tipoGasto'];
 
-    $sql = "INSERT INTO Gastos (Descripcion, Monto, Fecha, Metodo) VALUES ('$descripcion', '$monto', '$fecha', '$method')";
+    $sql = "INSERT INTO Gastos (Descripcion, Monto, Fecha, Metodo, Tipo) VALUES ('$descripcion', '$monto', '$fecha', '$method', '$tipoGasto')";
 
     if ($conexion->query($sql) === TRUE) {
         header('Location: index.php');
@@ -46,6 +47,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <select name="typeExpense" class="form-select">
                     <option>Tarjeta</option>
                     <option>Efectivo</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="tipoGasto" class="form-label">Tipo de Gasto</label>
+                <select name="tipoGasto" class="form-select">
+                    <option value="Fijo">Gasto Fijo</option>
+                    <option value="Central">Central de Abasto</option>
+                    <option value="En Sitio">En Sitio</option>
+                    <option value="Mantenimiento">Gasto de Mantenimiento</option>
+                    <option value="Inversiones">Inversiones</option>
                 </select>
             </div>
             <div class="mb-3">
