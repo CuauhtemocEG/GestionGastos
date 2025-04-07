@@ -138,8 +138,8 @@ $totalGastosEfectivo = calcularTotalEfectivo($gastosEfectivo);
                 </tr>
             </thead>
             <tbody>
-                <?php if (count($gastos) > 0): ?>
-                    <?php foreach ($gastos as $gasto): ?>
+                <?php if (count($gastosEfectivo) > 0): ?>
+                    <?php foreach ($gastosEfectivo as $gasto): ?>
                         <tr>
                             <td><?php echo $gasto['Descripcion']; ?></td>
                             <td><?php echo $gasto['Metodo']; ?></td>
