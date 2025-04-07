@@ -104,6 +104,7 @@ $totalGastosAll = calcularTotales($gastosTotales);
                 </div>
             </div>
         </form>
+        <br>
         <div class="row">
             <div class="col-md-6">
                 <!-- Resumen de gastos -->
