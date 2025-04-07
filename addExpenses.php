@@ -42,18 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="mb-3">
                 <label for="typeExpense" class="form-label">Medio de Pago</label>
                 <select name="typeExpense">
-                    <option>Pago con Tarjeta</option>
+                    <option>Tarjeta</option>
                     <option>Efectivo</option>
-                    <?php
-					$categorias = $conexion->query("SELECT * FROM Gastos");
-					if ($categorias->fetch_row() > 0) {
-						$categorias = $categorias->fetch_all();
-						foreach ($categorias as $row) {
-							echo '<option value="' . $row['ID'] . '" >' . $row['Metodo'] . '</option>';
-						}
-					}
-					$categorias = null;
-					?>
                 </select>
             </div>
             <div class="mb-3">
