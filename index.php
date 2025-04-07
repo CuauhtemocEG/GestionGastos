@@ -121,7 +121,7 @@ $totalGastosEfectivo = calcularTotalEfectivo($gastosEfectivo);
         <h3>Resumen de Gastos en Efectivo</h3>
         <ul class="list-group mb-4">
             <li class="list-group-item">
-                <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastos, 2); ?>
+                <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastosEfectivo, 2); ?>
             </li>
         </ul>
 
