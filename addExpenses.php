@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Error: " . $conexion->error;
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -42,6 +43,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <select name="typeExpense">
                     <option>Pago con Tarjeta</option>
                     <option>Efectivo</option>
+                    <?php
+					$categorias = $conexion->query("SELECT * FROM Gastos");
+					if ($categorias->fetch_row() > 0) {
+						$categorias = $categorias->fetch_all();
+						foreach ($categorias as $row) {
+							echo '<option value="' . $row['ID'] . '" >' . $row['Metodo'] . '</option>';
+						}
+					}
+					$categorias = null;
+					?>
                 </select>
             </div>
             <div class="mb-3">
