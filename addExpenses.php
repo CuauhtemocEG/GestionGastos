@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="mb-3">
                 <label for="typeExpense" class="form-label">Medio de Pago</label>
-                <select name="typeExpense">
+                <select name="typeExpense" class="custom-select">
                     <option>Tarjeta</option>
                     <option>Efectivo</option>
                 </select>
