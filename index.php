@@ -90,7 +90,7 @@ function calcularTotalesFijos($gastosTotalesFijos)
 // CENTRAL DE ABASTOS
 function obtenerGastosCentral($conexion, $fechaInicio, $fechaFin)
 {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Fijo'";
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Central'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
