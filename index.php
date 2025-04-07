@@ -192,7 +192,7 @@ $totalGastosAll = calcularTotales($gastosTotales);
                 </table>
             </div>
         </div>
-
+        <hr>
         <!-- Resumen de gastos -->
         <h3>Resumen de Gastos Totales</h3>
                 <ul class="list-group mb-4">
