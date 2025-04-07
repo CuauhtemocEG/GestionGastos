@@ -109,7 +109,7 @@ function calcularTotalesCentral($gastosTotalesCentral)
 // GASTOS EN SITIO
 function obtenerGastosSitio($conexion, $fechaInicio, $fechaFin)
 {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Central'";
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='En Sitio'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
@@ -128,7 +128,7 @@ function calcularTotalesSitio($gastosTotalesSitio)
 // GASTOS DE MANTENIMIENTO
 function obtenerGastosMantenimiento($conexion, $fechaInicio, $fechaFin)
 {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Central'";
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Mantenimiento'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
