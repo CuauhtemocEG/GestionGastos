@@ -4,7 +4,7 @@ include 'config.php';
 $fechaInicio = $_GET['fecha_inicio'] ?? date('Y-m-01');  // Fecha de inicio por defecto el primer día del mes
 $fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');          // Fecha de fin por defecto el día de hoy
 
-// Función para obtener los gastos dentro de un rango de fechas
+// Función para obtener los gastos en Tarjeta dentro de un rango de fechas
 function obtenerGastos($conexion, $fechaInicio, $fechaFin)
 {
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Metodo='Tarjeta'";
@@ -12,10 +12,10 @@ function obtenerGastos($conexion, $fechaInicio, $fechaFin)
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
 
-// Obtener los gastos
+// Obtener los gastos Tarjeta
 $gastos = obtenerGastos($conexion, $fechaInicio, $fechaFin);
 
-// Función para obtener los gastos dentro de un rango de fechas
+// Función para obtener los gastos en Efectivo dentro de un rango de fechas
 function obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin)
 {
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Metodo='Efectivo'";
@@ -23,8 +23,20 @@ function obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin)
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
 
-// Obtener los gastos
+// Obtener los gastos Efectivo
 $gastosEfectivo = obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin);
+
+// Función para obtener los gastos totales dentro de un rango de fechas
+function obtenerGastosTotales($conexion, $fechaInicio, $fechaFin)
+{
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin'";
+    $resultado = $conexion->query($sql);
+    return $resultado->fetch_all(MYSQLI_ASSOC);
+}
+
+// Obtener los gastos Efectivo
+$gastosTotales = obtenerGastosTotales($conexion, $fechaInicio, $fechaFin);
+
 
 // Función para calcular el total de los gastos
 function calcularTotal($gastos)
@@ -46,8 +58,19 @@ function calcularTotalEfectivo($gastosEfectivo)
     return $total;
 }
 
+// Función para calcular el total de los gastos
+function calcularTotales($gastosTotales)
+{
+    $total = 0;
+    foreach ($gastosTotales as $gastoEfectivo) {
+        $total += $gastoEfectivo['Monto'];
+    }
+    return $total;
+}
+
 $totalGastos = calcularTotal($gastos);
 $totalGastosEfectivo = calcularTotalEfectivo($gastosEfectivo);
+$totalGastosAll = calcularTotales($gastosTotales);
 ?>
 
 <!DOCTYPE html>
@@ -168,6 +191,47 @@ $totalGastosEfectivo = calcularTotalEfectivo($gastosEfectivo);
                 </table>
             </div>
         </div>
+
+        <!-- Resumen de gastos -->
+        <h3>Resumen de Gastos Totales</h3>
+                <ul class="list-group mb-4">
+                    <li class="list-group-item">
+                        <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastosAll, 2); ?>
+                    </li>
+                </ul>
+
+                <!-- Mostrar los gastos Efectivo-->
+                <h3>Lista de Gastos con Efectivo</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Método de Pago</th>
+                            <th>Monto</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (count($gastosTotales) > 0): ?>
+                            <?php foreach ($gastosTotales as $gasto): ?>
+                                <tr>
+                                    <td><?php echo $gasto['Descripcion']; ?></td>
+                                    <td><?php echo $gasto['Metodo']; ?></td>
+                                    <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
+                                    <td><?php echo $gasto['Fecha']; ?></td>
+                                    <td>
+                                        <a href="deleteExpenses.php?id=<?php echo $gasto['ID']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="4" class="text-center">No hay gastos registrados en este rango de fechas.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
 
         <!-- Agregar gasto -->
         <a href="addExpenses.php" class="btn btn-success mt-3">Agregar Nuevo Gasto</a>
