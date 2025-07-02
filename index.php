@@ -68,8 +68,24 @@ $totalGastosCentral = calcularTotal($gastosTotalesCentral);
 $totalGastosSitio = calcularTotal($gastosTotalesSitio);
 $totalGastosMantenimiento = calcularTotal($gastosTotalesMantenimiento);
 $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
-?>
 
+// Para los gráficos
+// 1. Gráfico de barras por tipo
+$labelsTipos = ["Fijo", "Central", "En Sitio", "Mantenimiento", "Inversiones"];
+$dataTipos = [
+    $totalGastosFijos,
+    $totalGastosCentral,
+    $totalGastosSitio,
+    $totalGastosMantenimiento,
+    $totalGastosInversiones
+];
+// 2. Gráfico de pastel por método de pago
+$labelsMetodo = ["Tarjeta", "Efectivo"];
+$dataMetodo = [
+    $totalGastos,
+    $totalGastosEfectivo
+];
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -77,71 +93,99 @@ $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Gastos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- ICONS Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { background: #f5f7fa; font-family: 'Segoe UI', Arial, sans-serif;}
-        .main-container { background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 2rem 2.5rem; margin: 2rem auto; max-width: 1100px;}
-        .section-title { margin-top: 2rem; margin-bottom: 1rem; font-size: 1.3rem; color: #295099; border-bottom: 2px solid #e9ecef; padding-bottom: 0.4rem; font-weight: 600;}
-        footer { color: #888; font-size: 0.95rem; margin-top: 2rem; text-align: center; }
-        .badge-total { font-size: 1.05em; background:#0071b3; }
+        .main-container { background: #fff; border-radius: 10px; box-shadow: 0 2px 16px rgba(0,0,0,0.09); padding: 2.5rem 2.5rem; margin: 2rem auto; max-width: 1200px;}
+        .section-title { margin-top: 2rem; margin-bottom: 1rem; font-size: 1.3rem; color: #2365bc; border-bottom: 2px solid #e9ecef; padding-bottom: 0.4rem; font-weight: 600;}
+        footer { color: #888; font-size: 0.96rem; margin-top: 2rem; text-align: center; }
+        .badge-total { font-size: 1.08em; background:#0d6efd; }
         .btn-collapse { margin-right: 0.5em; }
-        .table thead { background: #f2f2f2; }
-        .card { margin-bottom: 1.2em; }
+        .table thead { background: #f6fafd; }
+        .card { margin-bottom: 1.2em; border-radius: 0.75em; }
+        h1, h3, h5 { letter-spacing: 0.5px;}
+        .table-sm td, .table-sm th { padding: 0.45rem;}
+        .icon-section { font-size: 1.5em; color: #0d6efd; margin-right: 0.5em;}
+        .chart-card { background: #f9fbff; border: 1px solid #e0e8f3; padding: 1em 1.5em; border-radius: 12px; }
+        .chart-title { font-size: 1.08em; color: #295099; font-weight: 600;}
+        .btn-success { font-size: 1.1em;}
+        .table td i.bi { font-size: 1.15em; vertical-align: middle;}
     </style>
 </head>
 <body>
     <div class="main-container">
         <header class="mb-4">
-            <h1 class="text-center mb-1">Gestión de Gastos</h1>
+            <h1 class="text-center mb-2"><i class="bi bi-cash-coin icon-section"></i>Gestión de Gastos</h1>
+            <p class="text-center text-muted">Visualiza y controla tus gastos de manera ordenada y profesional.</p>
         </header>
         <!-- Filtro de fechas -->
         <form action="index.php" method="GET" class="mb-4">
             <div class="row align-items-end g-2">
                 <div class="col-sm-4">
-                    <label for="fecha_inicio" class="form-label">Fecha de inicio</label>
+                    <label for="fecha_inicio" class="form-label"><i class="bi bi-calendar-date"></i> Fecha de inicio</label>
                     <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="<?= $fechaInicio ?>">
                 </div>
                 <div class="col-sm-4">
-                    <label for="fecha_fin" class="form-label">Fecha de fin</label>
+                    <label for="fecha_fin" class="form-label"><i class="bi bi-calendar-date-fill"></i> Fecha de fin</label>
                     <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="<?= $fechaFin ?>">
                 </div>
                 <div class="col-sm-4">
-                    <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Buscar</button>
                 </div>
             </div>
         </form>
 
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="chart-card mb-3">
+                    <div class="chart-title mb-1"><i class="bi bi-pie-chart-fill"></i> Gastos por Método de Pago</div>
+                    <canvas id="graficoMetodo"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-card mb-3">
+                    <div class="chart-title mb-1"><i class="bi bi-bar-chart-fill"></i> Gastos por Categoría</div>
+                    <canvas id="graficoTipos"></canvas>
+                </div>
+            </div>
+        </div>
+
         <!-- Sección de categorías con collapse -->
-        <div class="section-title">Categorías de Gastos</div>
+        <div class="section-title"><i class="bi bi-folder2-open"></i> Categorías de Gastos</div>
         <div class="mb-3 d-flex flex-wrap gap-2">
-            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseFijo" role="button" aria-expanded="false">Gasto Fijo</a>
-            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseCentral" role="button" aria-expanded="false">Central de Abasto</a>
-            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseSitio" role="button" aria-expanded="false">Gasto en Sitio</a>
-            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseMantenimiento" role="button" aria-expanded="false">Gasto de Mantenimiento</a>
-            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseInversiones" role="button" aria-expanded="false">Inversiones</a>
+            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseFijo" role="button" aria-expanded="false"><i class="bi bi-house-gear"></i> Gasto Fijo</a>
+            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseCentral" role="button" aria-expanded="false"><i class="bi bi-basket2"></i> Central de Abasto</a>
+            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseSitio" role="button" aria-expanded="false"><i class="bi bi-shop"></i> Gasto en Sitio</a>
+            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseMantenimiento" role="button" aria-expanded="false"><i class="bi bi-tools"></i> Gasto de Mantenimiento</a>
+            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseInversiones" role="button" aria-expanded="false"><i class="bi bi-bar-chart-line"></i> Inversiones</a>
         </div>
         <!-- Collapse de cada categoría -->
         <?php
-        // Array para automatizar la generación de collapses
         $categorias = [
-            ['collapseFijo',         'Gastos Fijos',         $gastosTotalesFijos,         $totalGastosFijos],
-            ['collapseCentral',      'Central de Abasto',    $gastosTotalesCentral,       $totalGastosCentral],
-            ['collapseSitio',        'Gasto en Sitio',       $gastosTotalesSitio,         $totalGastosSitio],
-            ['collapseMantenimiento','Gasto de Mantenimiento', $gastosTotalesMantenimiento, $totalGastosMantenimiento],
-            ['collapseInversiones',  'Inversiones',          $gastosTotalesInversiones,   $totalGastosInversiones],
+            ['collapseFijo',         'Gastos Fijos',         $gastosTotalesFijos,         $totalGastosFijos,         'bi bi-house-gear'],
+            ['collapseCentral',      'Central de Abasto',    $gastosTotalesCentral,       $totalGastosCentral,       'bi bi-basket2'],
+            ['collapseSitio',        'Gasto en Sitio',       $gastosTotalesSitio,         $totalGastosSitio,         'bi bi-shop'],
+            ['collapseMantenimiento','Gasto de Mantenimiento', $gastosTotalesMantenimiento, $totalGastosMantenimiento, 'bi bi-tools'],
+            ['collapseInversiones',  'Inversiones',          $gastosTotalesInversiones,   $totalGastosInversiones,   'bi bi-bar-chart-line'],
         ];
-        foreach ($categorias as [$id, $nombre, $lista, $total]) { ?>
+        foreach ($categorias as [$id, $nombre, $lista, $total, $icon]) { ?>
             <div class="collapse" id="<?= $id ?>">
                 <div class="card card-body">
-                    <h5 class="mb-3"><?= $nombre ?> <span class="badge badge-total text-bg-primary">Total: $<?= number_format($total,2) ?></span></h5>
+                    <h5 class="mb-3"><i class="<?= $icon ?> me-2"></i><?= $nombre ?>
+                        <span class="badge badge-total text-bg-primary">Total: $<?= number_format($total,2) ?></span>
+                    </h5>
                     <div class="table-responsive">
                         <table class="table table-sm table-bordered align-middle">
                             <thead>
                                 <tr>
-                                    <th>Descripción</th>
-                                    <th>Método de Pago</th>
-                                    <th>Monto</th>
-                                    <th>Fecha</th>
-                                    <th>Acciones</th>
+                                    <th><i class="bi bi-card-text"></i> Descripción</th>
+                                    <th><i class="bi bi-credit-card-2-front"></i> Método</th>
+                                    <th><i class="bi bi-currency-dollar"></i> Monto</th>
+                                    <th><i class="bi bi-calendar-event"></i> Fecha</th>
+                                    <th><i class="bi bi-tools"></i> Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -151,7 +195,9 @@ $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
                                     <td><?= htmlspecialchars($gasto['Metodo']) ?></td>
                                     <td>$<?= number_format($gasto['Monto'],2) ?></td>
                                     <td><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                    <td><a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="btn btn-danger btn-sm">Eliminar</a></td>
+                                    <td>
+                                        <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="btn btn-danger btn-sm" title="Eliminar"><i class="bi bi-trash"></i></a>
+                                    </td>
                                 </tr>
                             <?php endforeach; else: ?>
                                 <tr>
@@ -165,20 +211,22 @@ $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
             </div>
         <?php } ?>
 
-        <div class="section-title">Resumen General</div>
+        <div class="section-title"><i class="bi bi-table"></i> Resumen General</div>
         <div class="row mb-3">
             <div class="col-md-6">
                 <div class="card card-body">
-                    <h5 class="mb-3">Gastos con Tarjeta <span class="badge badge-total text-bg-primary">Total: $<?= number_format($totalGastos,2) ?></span></h5>
+                    <h5 class="mb-3"><i class="bi bi-credit-card-2-front"></i> Gastos con Tarjeta
+                        <span class="badge badge-total text-bg-primary">Total: $<?= number_format($totalGastos,2) ?></span>
+                    </h5>
                     <div class="table-responsive">
                         <table class="table table-sm table-bordered align-middle">
                             <thead>
                                 <tr>
-                                    <th>Descripción</th>
-                                    <th>Método de Pago</th>
-                                    <th>Monto</th>
-                                    <th>Fecha</th>
-                                    <th>Acciones</th>
+                                    <th><i class="bi bi-card-text"></i> Descripción</th>
+                                    <th><i class="bi bi-credit-card-2-front"></i> Método</th>
+                                    <th><i class="bi bi-currency-dollar"></i> Monto</th>
+                                    <th><i class="bi bi-calendar-event"></i> Fecha</th>
+                                    <th><i class="bi bi-tools"></i> Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -188,7 +236,9 @@ $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
                                     <td><?= htmlspecialchars($gasto['Metodo']) ?></td>
                                     <td>$<?= number_format($gasto['Monto'],2) ?></td>
                                     <td><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                    <td><a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="btn btn-danger btn-sm">Eliminar</a></td>
+                                    <td>
+                                        <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="btn btn-danger btn-sm" title="Eliminar"><i class="bi bi-trash"></i></a>
+                                    </td>
                                 </tr>
                             <?php endforeach; else: ?>
                                 <tr>
@@ -202,16 +252,18 @@ $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
             </div>
             <div class="col-md-6">
                 <div class="card card-body">
-                    <h5 class="mb-3">Gastos en Efectivo <span class="badge badge-total text-bg-primary">Total: $<?= number_format($totalGastosEfectivo,2) ?></span></h5>
+                    <h5 class="mb-3"><i class="bi bi-cash"></i> Gastos en Efectivo
+                        <span class="badge badge-total text-bg-primary">Total: $<?= number_format($totalGastosEfectivo,2) ?></span>
+                    </h5>
                     <div class="table-responsive">
                         <table class="table table-sm table-bordered align-middle">
                             <thead>
                                 <tr>
-                                    <th>Descripción</th>
-                                    <th>Método de Pago</th>
-                                    <th>Monto</th>
-                                    <th>Fecha</th>
-                                    <th>Acciones</th>
+                                    <th><i class="bi bi-card-text"></i> Descripción</th>
+                                    <th><i class="bi bi-credit-card-2-front"></i> Método</th>
+                                    <th><i class="bi bi-currency-dollar"></i> Monto</th>
+                                    <th><i class="bi bi-calendar-event"></i> Fecha</th>
+                                    <th><i class="bi bi-tools"></i> Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -221,7 +273,9 @@ $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
                                     <td><?= htmlspecialchars($gasto['Metodo']) ?></td>
                                     <td>$<?= number_format($gasto['Monto'],2) ?></td>
                                     <td><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                    <td><a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="btn btn-danger btn-sm">Eliminar</a></td>
+                                    <td>
+                                        <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="btn btn-danger btn-sm" title="Eliminar"><i class="bi bi-trash"></i></a>
+                                    </td>
                                 </tr>
                             <?php endforeach; else: ?>
                                 <tr>
@@ -237,16 +291,18 @@ $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
 
         <!-- Gastos Totales -->
         <div class="card card-body mb-3">
-            <h5>Gastos Totales <span class="badge badge-total text-bg-primary">Total: $<?= number_format($totalGastosAll,2) ?></span></h5>
+            <h5><i class="bi bi-collection"></i> Gastos Totales
+                <span class="badge badge-total text-bg-primary">Total: $<?= number_format($totalGastosAll,2) ?></span>
+            </h5>
             <div class="table-responsive">
                 <table class="table table-sm table-bordered align-middle">
                     <thead>
                         <tr>
-                            <th>Descripción</th>
-                            <th>Método de Pago</th>
-                            <th>Monto</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
+                            <th><i class="bi bi-card-text"></i> Descripción</th>
+                            <th><i class="bi bi-credit-card-2-front"></i> Método</th>
+                            <th><i class="bi bi-currency-dollar"></i> Monto</th>
+                            <th><i class="bi bi-calendar-event"></i> Fecha</th>
+                            <th><i class="bi bi-tools"></i> Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -256,7 +312,9 @@ $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
                             <td><?= htmlspecialchars($gasto['Metodo']) ?></td>
                             <td>$<?= number_format($gasto['Monto'],2) ?></td>
                             <td><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                            <td><a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="btn btn-danger btn-sm">Eliminar</a></td>
+                            <td>
+                                <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="btn btn-danger btn-sm" title="Eliminar"><i class="bi bi-trash"></i></a>
+                            </td>
                         </tr>
                     <?php endforeach; else: ?>
                         <tr>
@@ -268,12 +326,60 @@ $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
             </div>
         </div>
         <div class="text-end">
-            <a href="addExpenses.php" class="btn btn-success">Agregar Nuevo Gasto</a>
+            <a href="addExpenses.php" class="btn btn-success"><i class="bi bi-plus-circle"></i> Agregar Nuevo Gasto</a>
         </div>
         <footer class="mt-4">
             &copy; <?= date('Y') ?> Gestión de Gastos · Desarrollado por CuauhtemocEG
         </footer>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Gráfico de pastel por método de pago
+        const ctxMetodo = document.getElementById('graficoMetodo').getContext('2d');
+        new Chart(ctxMetodo, {
+            type: 'doughnut',
+            data: {
+                labels: <?= json_encode($labelsMetodo) ?>,
+                datasets: [{
+                    data: <?= json_encode($dataMetodo) ?>,
+                    backgroundColor: ["#0d6efd", "#20c997"],
+                    borderColor: "#fff",
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // Gráfico de barras por tipo de gasto
+        const ctxTipos = document.getElementById('graficoTipos').getContext('2d');
+        new Chart(ctxTipos, {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode($labelsTipos) ?>,
+                datasets: [{
+                    data: <?= json_encode($dataTipos) ?>,
+                    label: "Total por categoría",
+                    backgroundColor: [
+                        "#2e86de", "#38ada9", "#e17055", "#fdcb6e", "#6c5ce7"
+                    ],
+                    borderRadius: 7,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
