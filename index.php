@@ -92,7 +92,6 @@ $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
     <div class="main-container">
         <header class="mb-4">
             <h1 class="text-center mb-1">Gestión de Gastos</h1>
-            <p class="text-center text-muted">Visualiza y controla tus gastos de manera ordenada y profesional.</p>
         </header>
         <!-- Filtro de fechas -->
         <form action="index.php" method="GET" class="mb-4">
