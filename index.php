@@ -99,7 +99,7 @@ $dataMetodo = [
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { background: #f5f7fa; font-family: 'Segoe UI', Arial, sans-serif;}
-        .main-container { background: #fff; border-radius: 10px; box-shadow: 0 2px 16px rgba(0,0,0,0.09); padding: 2.5rem 2.5rem; margin: 2rem auto; max-width: 1200px;}
+        .main-container { background: #fff; border-radius: 10px; box-shadow: 0 2px 16px rgba(0,0,0,0.09); padding: 2.5rem 2.5rem; margin: 2rem auto; max-width: 90%;}
         .section-title { margin-top: 2rem; margin-bottom: 1rem; font-size: 1.3rem; color: #2365bc; border-bottom: 2px solid #e9ecef; padding-bottom: 0.4rem; font-weight: 600;}
         footer { color: #888; font-size: 0.96rem; margin-top: 2rem; text-align: center; }
         .badge-total { font-size: 1.08em; background:#0d6efd; }
