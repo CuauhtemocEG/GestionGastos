@@ -1,505 +1,246 @@
 <?php
 include 'config.php';
 
-$fechaInicio = $_GET['fecha_inicio'] ?? date('Y-m-01');  // Fecha de inicio por defecto el primer día del mes
-$fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');          // Fecha de fin por defecto el día de hoy
+$fechaInicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
+$fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');
 
-// Función para obtener los gastos en Tarjeta dentro de un rango de fechas
-function obtenerGastos($conexion, $fechaInicio, $fechaFin)
-{
+// Funciones de obtención y sumatoria de gastos (igual que el original)
+function obtenerGastos($conexion, $fechaInicio, $fechaFin) {
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Metodo='Tarjeta'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-
-// Obtener los gastos Tarjeta
-$gastos = obtenerGastos($conexion, $fechaInicio, $fechaFin);
-
-// Función para obtener los gastos en Efectivo dentro de un rango de fechas
-function obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin)
-{
+function obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin) {
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Metodo='Efectivo'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-
-// Obtener los gastos Efectivo
-$gastosEfectivo = obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin);
-
-// Función para obtener los gastos totales dentro de un rango de fechas
-function obtenerGastosTotales($conexion, $fechaInicio, $fechaFin)
-{
+function obtenerGastosTotales($conexion, $fechaInicio, $fechaFin) {
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-
-// Obtener los gastos Efectivo
-$gastosTotales = obtenerGastosTotales($conexion, $fechaInicio, $fechaFin);
-
-
-// Función para calcular el total de los gastos
-function calcularTotal($gastos)
-{
+function calcularTotal($gastos) {
     $total = 0;
-    foreach ($gastos as $gasto) {
-        $total += $gasto['Monto'];
-    }
+    foreach ($gastos as $gasto) $total += $gasto['Monto'];
     return $total;
 }
-
-// Función para calcular el total de los gastos
-function calcularTotalEfectivo($gastosEfectivo)
-{
-    $total = 0;
-    foreach ($gastosEfectivo as $gastoEfectivo) {
-        $total += $gastoEfectivo['Monto'];
-    }
-    return $total;
-}
-
-// Función para calcular el total de los gastos
-function calcularTotales($gastosTotales)
-{
-    $total = 0;
-    foreach ($gastosTotales as $gastoEfectivo) {
-        $total += $gastoEfectivo['Monto'];
-    }
-    return $total;
-}
-
-// FIJOS
-function obtenerGastosFijos($conexion, $fechaInicio, $fechaFin)
-{
+function obtenerGastosFijos($conexion, $fechaInicio, $fechaFin) {
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Fijo'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-
-$gastosTotalesFijos = obtenerGastosFijos($conexion, $fechaInicio, $fechaFin);
-
-function calcularTotalesFijos($gastosTotalesFijos)
-{
-    $total = 0;
-    foreach ($gastosTotalesFijos as $gastoFijo) {
-        $total += $gastoFijo['Monto'];
-    }
-    return $total;
-}
-
-// CENTRAL DE ABASTOS
-function obtenerGastosCentral($conexion, $fechaInicio, $fechaFin)
-{
+function obtenerGastosCentral($conexion, $fechaInicio, $fechaFin) {
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Central'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-
-$gastosTotalesCentral = obtenerGastosCentral($conexion, $fechaInicio, $fechaFin);
-
-function calcularTotalesCentral($gastosTotalesCentral)
-{
-    $total = 0;
-    foreach ($gastosTotalesCentral as $gastoCentral) {
-        $total += $gastoCentral['Monto'];
-    }
-    return $total;
-}
-
-// GASTOS EN SITIO
-function obtenerGastosSitio($conexion, $fechaInicio, $fechaFin)
-{
+function obtenerGastosSitio($conexion, $fechaInicio, $fechaFin) {
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='En Sitio'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-
-$gastosTotalesSitio = obtenerGastosSitio($conexion, $fechaInicio, $fechaFin);
-
-function calcularTotalesSitio($gastosTotalesSitio)
-{
-    $total = 0;
-    foreach ($gastosTotalesSitio as $gastoSitio) {
-        $total += $gastoSitio['Monto'];
-    }
-    return $total;
-}
-
-// GASTOS DE MANTENIMIENTO
-function obtenerGastosMantenimiento($conexion, $fechaInicio, $fechaFin)
-{
+function obtenerGastosMantenimiento($conexion, $fechaInicio, $fechaFin) {
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Mantenimiento'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-
-$gastosTotalesMantenimiento = obtenerGastosMantenimiento($conexion, $fechaInicio, $fechaFin);
-
-function calcularTotalesMantenimiento($gastosTotalesSitio)
-{
-    $total = 0;
-    foreach ($gastosTotalesSitio as $gastoSitio) {
-        $total += $gastoSitio['Monto'];
-    }
-    return $total;
-}
-
-// GASTOS DE INVERSION
-function obtenerGastosInversiones($conexion, $fechaInicio, $fechaFin)
-{
+function obtenerGastosInversiones($conexion, $fechaInicio, $fechaFin) {
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Inversiones'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-
+// Totales
+$gastos = obtenerGastos($conexion, $fechaInicio, $fechaFin);
+$gastosEfectivo = obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin);
+$gastosTotales = obtenerGastosTotales($conexion, $fechaInicio, $fechaFin);
+$gastosTotalesFijos = obtenerGastosFijos($conexion, $fechaInicio, $fechaFin);
+$gastosTotalesCentral = obtenerGastosCentral($conexion, $fechaInicio, $fechaFin);
+$gastosTotalesSitio = obtenerGastosSitio($conexion, $fechaInicio, $fechaFin);
+$gastosTotalesMantenimiento = obtenerGastosMantenimiento($conexion, $fechaInicio, $fechaFin);
 $gastosTotalesInversiones = obtenerGastosInversiones($conexion, $fechaInicio, $fechaFin);
 
-function calcularTotalesInversiones($gastosTotalesSitio)
-{
-    $total = 0;
-    foreach ($gastosTotalesSitio as $gastoSitio) {
-        $total += $gastoSitio['Monto'];
-    }
-    return $total;
-}
-
 $totalGastos = calcularTotal($gastos);
-$totalGastosEfectivo = calcularTotalEfectivo($gastosEfectivo);
-$totalGastosAll = calcularTotales($gastosTotales);
-$totalGastosFijos = calcularTotalesFijos($gastosTotalesFijos);
-$totalGastosCentral = calcularTotalesCentral($gastosTotalesCentral);
-$totalGastosSitio = calcularTotalesSitio($gastosTotalesSitio);
-$totalGastosMantenimiento = calcularTotalesMantenimiento($gastosTotalesMantenimiento);
-$totalGastosInversiones = calcularTotalesInversiones($gastosTotalesInversiones);
+$totalGastosEfectivo = calcularTotal($gastosEfectivo);
+$totalGastosAll = calcularTotal($gastosTotales);
+$totalGastosFijos = calcularTotal($gastosTotalesFijos);
+$totalGastosCentral = calcularTotal($gastosTotalesCentral);
+$totalGastosSitio = calcularTotal($gastosTotalesSitio);
+$totalGastosMantenimiento = calcularTotal($gastosTotalesMantenimiento);
+$totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Gastos</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f5f7fa; font-family: 'Segoe UI', Arial, sans-serif;}
+        .main-container { background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 2rem 2.5rem; margin: 2rem auto; max-width: 1100px;}
+        .section-title { margin-top: 2rem; margin-bottom: 1rem; font-size: 1.3rem; color: #295099; border-bottom: 2px solid #e9ecef; padding-bottom: 0.4rem; font-weight: 600;}
+        footer { color: #888; font-size: 0.95rem; margin-top: 2rem; text-align: center; }
+        .badge-total { font-size: 1.05em; background:#0071b3; }
+        .btn-collapse { margin-right: 0.5em; }
+        .table thead { background: #f2f2f2; }
+        .card { margin-bottom: 1.2em; }
+    </style>
 </head>
-
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">Gestión de Gastos</h1>
-
+    <div class="main-container">
+        <header class="mb-4">
+            <h1 class="text-center mb-1">Gestión de Gastos</h1>
+            <p class="text-center text-muted">Visualiza y controla tus gastos de manera ordenada y profesional.</p>
+        </header>
         <!-- Filtro de fechas -->
-        <form action="index.php" method="GET">
-            <div class="row mb-3">
-                <div class="col-md-4">
+        <form action="index.php" method="GET" class="mb-4">
+            <div class="row align-items-end g-2">
+                <div class="col-sm-4">
                     <label for="fecha_inicio" class="form-label">Fecha de inicio</label>
-                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="<?php echo $fechaInicio; ?>">
+                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="<?= $fechaInicio ?>">
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-4">
                     <label for="fecha_fin" class="form-label">Fecha de fin</label>
-                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="<?php echo $fechaFin; ?>">
+                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="<?= $fechaFin ?>">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label" style="visibility: hidden;">Buscar</label>
-                    <button type="submit" class="btn btn-primary form-control">Buscar</button>
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-primary w-100">Buscar</button>
                 </div>
             </div>
         </form>
-        <br>
-        <!-- Collapse -->
-        <p>
-            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseFijo" role="button" aria-expanded="false" aria-controls="collapseExample">
-                Gasto Fijo
-            </a>
-            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseCentral" role="button" aria-expanded="false" aria-controls="collapseExample">
-                Central de Abasto
-            </a>
-            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseSitio" role="button" aria-expanded="false" aria-controls="collapseExample">
-                Gasto en Sitio
-            </a>
-            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseMantenimiento" role="button" aria-expanded="false" aria-controls="collapseExample">
-                Gasto de Mantenimiento
-            </a>
-            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseInversiones" role="button" aria-expanded="false" aria-controls="collapseExample">
-                Inversiones
-            </a>
-        </p>
-        <div class="collapse" id="collapseFijo">
-            <div class="card card-body">
-                <!-- Resumen de gastos -->
-                <h3>Resumen de Gastos - Gastos Fijos</h3>
-                <ul class="list-group mb-4">
-                    <li class="list-group-item">
-                        <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastosFijos, 2); ?>
-                    </li>
-                </ul>
 
-                <!-- Mostrar los gastos Efectivo-->
-                <h3>Lista de Gastos Totales Fijos</h3>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th>Método de Pago</th>
-                            <th>Monto</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (count($gastosTotalesFijos) > 0): ?>
-                            <?php foreach ($gastosTotalesFijos as $gasto): ?>
-                                <tr>
-                                    <td><?php echo $gasto['Descripcion']; ?></td>
-                                    <td><?php echo $gasto['Metodo']; ?></td>
-                                    <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
-                                    <td><?php echo $gasto['Fecha']; ?></td>
-                                    <td>
-                                        <a href="deleteExpenses.php?id=<?php echo $gasto['ID']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+        <!-- Sección de categorías con collapse -->
+        <div class="section-title">Categorías de Gastos</div>
+        <div class="mb-3 d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseFijo" role="button" aria-expanded="false">Gasto Fijo</a>
+            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseCentral" role="button" aria-expanded="false">Central de Abasto</a>
+            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseSitio" role="button" aria-expanded="false">Gasto en Sitio</a>
+            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseMantenimiento" role="button" aria-expanded="false">Gasto de Mantenimiento</a>
+            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseInversiones" role="button" aria-expanded="false">Inversiones</a>
         </div>
-        <div class="collapse" id="collapseCentral">
-            <div class="card card-body">
-                <!-- Resumen de gastos -->
-                <h3>Resumen de Gastos - Central de Abastos</h3>
-                <ul class="list-group mb-4">
-                    <li class="list-group-item">
-                        <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastosCentral, 2); ?>
-                    </li>
-                </ul>
+        <!-- Collapse de cada categoría -->
+        <?php
+        // Array para automatizar la generación de collapses
+        $categorias = [
+            ['collapseFijo',         'Gastos Fijos',         $gastosTotalesFijos,         $totalGastosFijos],
+            ['collapseCentral',      'Central de Abasto',    $gastosTotalesCentral,       $totalGastosCentral],
+            ['collapseSitio',        'Gasto en Sitio',       $gastosTotalesSitio,         $totalGastosSitio],
+            ['collapseMantenimiento','Gasto de Mantenimiento', $gastosTotalesMantenimiento, $totalGastosMantenimiento],
+            ['collapseInversiones',  'Inversiones',          $gastosTotalesInversiones,   $totalGastosInversiones],
+        ];
+        foreach ($categorias as [$id, $nombre, $lista, $total]) { ?>
+            <div class="collapse" id="<?= $id ?>">
+                <div class="card card-body">
+                    <h5 class="mb-3"><?= $nombre ?> <span class="badge badge-total text-bg-primary">Total: $<?= number_format($total,2) ?></span></h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Descripción</th>
+                                    <th>Método de Pago</th>
+                                    <th>Monto</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php if (count($lista) > 0): foreach ($lista as $gasto): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($gasto['Descripcion']) ?></td>
+                                    <td><?= htmlspecialchars($gasto['Metodo']) ?></td>
+                                    <td>$<?= number_format($gasto['Monto'],2) ?></td>
+                                    <td><?= htmlspecialchars($gasto['Fecha']) ?></td>
+                                    <td><a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="btn btn-danger btn-sm">Eliminar</a></td>
+                                </tr>
+                            <?php endforeach; else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No hay gastos registrados en este rango de fechas.</td>
+                                </tr>
+                            <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
 
-                <!-- Mostrar los gastos Efectivo-->
-                <h3>Lista de Gastos - Central de Abastos</h3>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th>Método de Pago</th>
-                            <th>Monto</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (count($gastosTotalesCentral) > 0): ?>
-                            <?php foreach ($gastosTotalesCentral as $gasto): ?>
-                                <tr>
-                                    <td><?php echo $gasto['Descripcion']; ?></td>
-                                    <td><?php echo $gasto['Metodo']; ?></td>
-                                    <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
-                                    <td><?php echo $gasto['Fecha']; ?></td>
-                                    <td>
-                                        <a href="deleteExpenses.php?id=<?php echo $gasto['ID']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="collapse" id="collapseSitio">
-            <div class="card card-body">
-                <!-- Resumen de gastos -->
-                <h3>Resumen de Gastos - Gasto en Sitio</h3>
-                <ul class="list-group mb-4">
-                    <li class="list-group-item">
-                        <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastosSitio, 2); ?>
-                    </li>
-                </ul>
-
-                <!-- Mostrar los gastos Efectivo-->
-                <h3>Lista de Gastos - Gasto en Sitio</h3>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th>Método de Pago</th>
-                            <th>Monto</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (count($gastosTotalesSitio) > 0): ?>
-                            <?php foreach ($gastosTotalesSitio as $gasto): ?>
-                                <tr>
-                                    <td><?php echo $gasto['Descripcion']; ?></td>
-                                    <td><?php echo $gasto['Metodo']; ?></td>
-                                    <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
-                                    <td><?php echo $gasto['Fecha']; ?></td>
-                                    <td>
-                                        <a href="deleteExpenses.php?id=<?php echo $gasto['ID']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="collapse" id="collapseMantenimiento">
-            <div class="card card-body">
-                <!-- Resumen de gastos -->
-                <h3>Resumen de Gastos - Gasto de Mantenimiento</h3>
-                <ul class="list-group mb-4">
-                    <li class="list-group-item">
-                        <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastosMantenimiento, 2); ?>
-                    </li>
-                </ul>
-
-                <!-- Mostrar los gastos Efectivo-->
-                <h3>Lista de Gastos - Gasto de Mantenimiento</h3>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th>Método de Pago</th>
-                            <th>Monto</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (count($gastosTotalesMantenimiento) > 0): ?>
-                            <?php foreach ($gastosTotalesMantenimiento as $gasto): ?>
-                                <tr>
-                                    <td><?php echo $gasto['Descripcion']; ?></td>
-                                    <td><?php echo $gasto['Metodo']; ?></td>
-                                    <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
-                                    <td><?php echo $gasto['Fecha']; ?></td>
-                                    <td>
-                                        <a href="deleteExpenses.php?id=<?php echo $gasto['ID']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="collapse" id="collapseInversiones">
-            <div class="card card-body">
-                <!-- Resumen de gastos -->
-                <h3>Resumen de Gastos - Gasto de Inversiones</h3>
-                <ul class="list-group mb-4">
-                    <li class="list-group-item">
-                        <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastosInversiones, 2); ?>
-                    </li>
-                </ul>
-
-                <!-- Mostrar los gastos Efectivo-->
-                <h3>Lista de Gastos - Gasto de Inversiones</h3>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th>Método de Pago</th>
-                            <th>Monto</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (count($gastosTotalesInversiones) > 0): ?>
-                            <?php foreach ($gastosTotalesInversiones as $gasto): ?>
-                                <tr>
-                                    <td><?php echo $gasto['Descripcion']; ?></td>
-                                    <td><?php echo $gasto['Metodo']; ?></td>
-                                    <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
-                                    <td><?php echo $gasto['Fecha']; ?></td>
-                                    <td>
-                                        <a href="deleteExpenses.php?id=<?php echo $gasto['ID']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <hr>
-        <div class="row">
+        <div class="section-title">Resumen General</div>
+        <div class="row mb-3">
             <div class="col-md-6">
-                <!-- Resumen de gastos -->
-                <h3>Resumen de Gastos con Tarjeta</h3>
-                <ul class="list-group mb-4">
-                    <li class="list-group-item">
-                        <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastos, 2); ?>
-                    </li>
-                </ul>
-
-                <!-- Mostrar los gastos Tarjeta-->
-                <h3>Lista de Gastos con Tarjeta</h3>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th>Método de Pago</th>
-                            <th>Monto</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (count($gastos) > 0): ?>
-                            <?php foreach ($gastos as $gasto): ?>
+                <div class="card card-body">
+                    <h5 class="mb-3">Gastos con Tarjeta <span class="badge badge-total text-bg-primary">Total: $<?= number_format($totalGastos,2) ?></span></h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle">
+                            <thead>
                                 <tr>
-                                    <td><?php echo $gasto['Descripcion']; ?></td>
-                                    <td><?php echo $gasto['Metodo']; ?></td>
-                                    <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
-                                    <td><?php echo $gasto['Fecha']; ?></td>
-                                    <td>
-                                        <a href="deleteExpenses.php?id=<?php echo $gasto['ID']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
-                                    </td>
+                                    <th>Descripción</th>
+                                    <th>Método de Pago</th>
+                                    <th>Monto</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                            <?php if (count($gastos) > 0): foreach ($gastos as $gasto): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($gasto['Descripcion']) ?></td>
+                                    <td><?= htmlspecialchars($gasto['Metodo']) ?></td>
+                                    <td>$<?= number_format($gasto['Monto'],2) ?></td>
+                                    <td><?= htmlspecialchars($gasto['Fecha']) ?></td>
+                                    <td><a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="btn btn-danger btn-sm">Eliminar</a></td>
+                                </tr>
+                            <?php endforeach; else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No hay gastos registrados en este rango de fechas.</td>
+                                </tr>
+                            <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-
             <div class="col-md-6">
-                <!-- Resumen de gastos -->
-                <h3>Resumen de Gastos en Efectivo</h3>
-                <ul class="list-group mb-4">
-                    <li class="list-group-item">
-                        <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastosEfectivo, 2); ?>
-                    </li>
-                </ul>
+                <div class="card card-body">
+                    <h5 class="mb-3">Gastos en Efectivo <span class="badge badge-total text-bg-primary">Total: $<?= number_format($totalGastosEfectivo,2) ?></span></h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Descripción</th>
+                                    <th>Método de Pago</th>
+                                    <th>Monto</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php if (count($gastosEfectivo) > 0): foreach ($gastosEfectivo as $gasto): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($gasto['Descripcion']) ?></td>
+                                    <td><?= htmlspecialchars($gasto['Metodo']) ?></td>
+                                    <td>$<?= number_format($gasto['Monto'],2) ?></td>
+                                    <td><?= htmlspecialchars($gasto['Fecha']) ?></td>
+                                    <td><a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="btn btn-danger btn-sm">Eliminar</a></td>
+                                </tr>
+                            <?php endforeach; else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No hay gastos registrados en este rango de fechas.</td>
+                                </tr>
+                            <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <!-- Mostrar los gastos Efectivo-->
-                <h3>Lista de Gastos con Efectivo</h3>
-                <table class="table table-bordered">
+        <!-- Gastos Totales -->
+        <div class="card card-body mb-3">
+            <h5>Gastos Totales <span class="badge badge-total text-bg-primary">Total: $<?= number_format($totalGastosAll,2) ?></span></h5>
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered align-middle">
                     <thead>
                         <tr>
                             <th>Descripción</th>
@@ -510,74 +251,30 @@ $totalGastosInversiones = calcularTotalesInversiones($gastosTotalesInversiones);
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (count($gastosEfectivo) > 0): ?>
-                            <?php foreach ($gastosEfectivo as $gasto): ?>
-                                <tr>
-                                    <td><?php echo $gasto['Descripcion']; ?></td>
-                                    <td><?php echo $gasto['Metodo']; ?></td>
-                                    <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
-                                    <td><?php echo $gasto['Fecha']; ?></td>
-                                    <td>
-                                        <a href="deleteExpenses.php?id=<?php echo $gasto['ID']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
+                    <?php if (count($gastosTotales) > 0): foreach ($gastosTotales as $gasto): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($gasto['Descripcion']) ?></td>
+                            <td><?= htmlspecialchars($gasto['Metodo']) ?></td>
+                            <td>$<?= number_format($gasto['Monto'],2) ?></td>
+                            <td><?= htmlspecialchars($gasto['Fecha']) ?></td>
+                            <td><a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="btn btn-danger btn-sm">Eliminar</a></td>
+                        </tr>
+                    <?php endforeach; else: ?>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No hay gastos registrados en este rango de fechas.</td>
+                        </tr>
+                    <?php endif; ?>
                     </tbody>
                 </table>
             </div>
         </div>
-        <hr>
-        <!-- Resumen de gastos -->
-        <h3>Resumen de Gastos Totales</h3>
-        <ul class="list-group mb-4">
-            <li class="list-group-item">
-                <strong>Total de Gastos: </strong> $<?php echo number_format($totalGastosAll, 2); ?>
-            </li>
-        </ul>
-
-        <!-- Mostrar los gastos Efectivo-->
-        <h3>Lista de Gastos Totales</h3>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Descripción</th>
-                    <th>Método de Pago</th>
-                    <th>Monto</th>
-                    <th>Fecha</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (count($gastosTotales) > 0): ?>
-                    <?php foreach ($gastosTotales as $gasto): ?>
-                        <tr>
-                            <td><?php echo $gasto['Descripcion']; ?></td>
-                            <td><?php echo $gasto['Metodo']; ?></td>
-                            <td>$<?php echo number_format($gasto['Monto'], 2); ?></td>
-                            <td><?php echo $gasto['Fecha']; ?></td>
-                            <td>
-                                <a href="deleteExpenses.php?id=<?php echo $gasto['ID']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="4" class="text-center">No hay gastos registrados en este rango de fechas.</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
-
-        <!-- Agregar gasto -->
-        <a href="addExpenses.php" class="btn btn-success mt-3">Agregar Nuevo Gasto</a>
+        <div class="text-end">
+            <a href="addExpenses.php" class="btn btn-success">Agregar Nuevo Gasto</a>
+        </div>
+        <footer class="mt-4">
+            &copy; <?= date('Y') ?> Gestión de Gastos · Desarrollado por CuauhtemocEG
+        </footer>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
