@@ -4,7 +4,6 @@ include 'config.php';
 $fechaInicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
 $fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');
 
-// Funciones de obtención y sumatoria de gastos (igual que el original)
 function obtenerGastos($conexion, $fechaInicio, $fechaFin) {
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Metodo='Tarjeta'";
     $resultado = $conexion->query($sql);
@@ -50,7 +49,6 @@ function obtenerGastosInversiones($conexion, $fechaInicio, $fechaFin) {
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-// Totales
 $gastos = obtenerGastos($conexion, $fechaInicio, $fechaFin);
 $gastosEfectivo = obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin);
 $gastosTotales = obtenerGastosTotales($conexion, $fechaInicio, $fechaFin);
@@ -69,8 +67,6 @@ $totalGastosSitio = calcularTotal($gastosTotalesSitio);
 $totalGastosMantenimiento = calcularTotal($gastosTotalesMantenimiento);
 $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
 
-// Para los gráficos
-// 1. Gráfico de barras por tipo
 $labelsTipos = ["Fijo", "Central", "En Sitio", "Mantenimiento", "Inversiones"];
 $dataTipos = [
     $totalGastosFijos,
@@ -79,7 +75,7 @@ $dataTipos = [
     $totalGastosMantenimiento,
     $totalGastosInversiones
 ];
-// 2. Gráfico de pastel por método de pago
+
 $labelsMetodo = ["Tarjeta", "Efectivo"];
 $dataMetodo = [
     $totalGastos,
@@ -93,9 +89,7 @@ $dataMetodo = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Gastos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- ICONS Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { background: #f5f7fa; font-family: 'Segoe UI', Arial, sans-serif;}
@@ -121,7 +115,7 @@ $dataMetodo = [
             <h1 class="text-center mb-2"><i class="bi bi-cash-coin icon-section"></i>Gestión de Gastos</h1>
             <p class="text-center text-muted">Visualiza y controla tus gastos de manera ordenada y profesional.</p>
         </header>
-        <!-- Filtro de fechas -->
+
         <form action="index.php" method="GET" class="mb-4">
             <div class="row align-items-end g-2">
                 <div class="col-sm-4">
@@ -153,7 +147,6 @@ $dataMetodo = [
             </div>
         </div>
 
-        <!-- Sección de categorías con collapse -->
         <div class="section-title"><i class="bi bi-folder2-open"></i> Categorías de Gastos</div>
         <div class="mb-3 d-flex flex-wrap gap-2">
             <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseFijo" role="button" aria-expanded="false"><i class="bi bi-house-gear"></i> Gasto Fijo</a>
@@ -162,7 +155,7 @@ $dataMetodo = [
             <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseMantenimiento" role="button" aria-expanded="false"><i class="bi bi-tools"></i> Gasto de Mantenimiento</a>
             <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseInversiones" role="button" aria-expanded="false"><i class="bi bi-bar-chart-line"></i> Inversiones</a>
         </div>
-        <!-- Collapse de cada categoría -->
+
         <?php
         $categorias = [
             ['collapseFijo',         'Gastos Fijos',         $gastosTotalesFijos,         $totalGastosFijos,         'bi bi-house-gear'],
@@ -289,7 +282,6 @@ $dataMetodo = [
             </div>
         </div>
 
-        <!-- Gastos Totales -->
         <div class="card card-body mb-3">
             <h5><i class="bi bi-collection"></i> Gastos Totales
                 <span class="badge badge-total text-bg-primary">Total: $<?= number_format($totalGastosAll,2) ?></span>
@@ -334,7 +326,6 @@ $dataMetodo = [
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Gráfico de pastel por método de pago
         const ctxMetodo = document.getElementById('graficoMetodo').getContext('2d');
         new Chart(ctxMetodo, {
             type: 'doughnut',
@@ -355,7 +346,6 @@ $dataMetodo = [
             }
         });
 
-        // Gráfico de barras por tipo de gasto
         const ctxTipos = document.getElementById('graficoTipos').getContext('2d');
         new Chart(ctxTipos, {
             type: 'bar',
