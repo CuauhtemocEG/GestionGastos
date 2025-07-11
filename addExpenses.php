@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <select name="tipoGasto" class="form-select">
                     <option value="Fijo">Gasto Fijo</option>
                     <option value="Central">Central de Abasto</option>
-                    <option value="En Sitio">En Sitio</option>
+                    <option value="Mercado">Mercado</option>
                     <option value="Mantenimiento">Gasto de Mantenimiento</option>
                     <option value="Inversiones">Inversiones</option>
                 </select>

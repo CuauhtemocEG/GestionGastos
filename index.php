@@ -151,7 +151,7 @@ $dataMetodo = [
         <div class="mb-3 d-flex flex-wrap gap-2">
             <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseFijo" role="button" aria-expanded="false"><i class="bi bi-house-gear"></i> Gasto Fijo</a>
             <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseCentral" role="button" aria-expanded="false"><i class="bi bi-basket2"></i> Central de Abasto</a>
-            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseSitio" role="button" aria-expanded="false"><i class="bi bi-shop"></i> Gasto en Sitio</a>
+            <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseSitio" role="button" aria-expanded="false"><i class="bi bi-shop"></i> Mercado</a>
             <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseMantenimiento" role="button" aria-expanded="false"><i class="bi bi-tools"></i> Gasto de Mantenimiento</a>
             <a class="btn btn-outline-primary btn-collapse" data-bs-toggle="collapse" href="#collapseInversiones" role="button" aria-expanded="false"><i class="bi bi-bar-chart-line"></i> Inversiones</a>
         </div>
