@@ -35,7 +35,7 @@ function obtenerGastosCentral($conexion, $fechaInicio, $fechaFin) {
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
 function obtenerGastosSitio($conexion, $fechaInicio, $fechaFin) {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='En Sitio'";
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Mercado'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
@@ -67,7 +67,7 @@ $totalGastosSitio = calcularTotal($gastosTotalesSitio);
 $totalGastosMantenimiento = calcularTotal($gastosTotalesMantenimiento);
 $totalGastosInversiones = calcularTotal($gastosTotalesInversiones);
 
-$labelsTipos = ["Fijo", "Central", "En Sitio", "Mantenimiento", "Inversiones"];
+$labelsTipos = ["Fijo", "Central", "Mercado", "Mantenimiento", "Inversiones"];
 $dataTipos = [
     $totalGastosFijos,
     $totalGastosCentral,
@@ -160,7 +160,7 @@ $dataMetodo = [
         $categorias = [
             ['collapseFijo',         'Gastos Fijos',         $gastosTotalesFijos,         $totalGastosFijos,         'bi bi-house-gear'],
             ['collapseCentral',      'Central de Abasto',    $gastosTotalesCentral,       $totalGastosCentral,       'bi bi-basket2'],
-            ['collapseSitio',        'Gasto en Sitio',       $gastosTotalesSitio,         $totalGastosSitio,         'bi bi-shop'],
+            ['collapseSitio',        'Mercado',       $gastosTotalesSitio,         $totalGastosSitio,         'bi bi-shop'],
             ['collapseMantenimiento','Gasto de Mantenimiento', $gastosTotalesMantenimiento, $totalGastosMantenimiento, 'bi bi-tools'],
             ['collapseInversiones',  'Inversiones',          $gastosTotalesInversiones,   $totalGastosInversiones,   'bi bi-bar-chart-line'],
         ];
