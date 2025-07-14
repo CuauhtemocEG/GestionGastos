@@ -53,7 +53,7 @@ $pagos = $conexion->query("SELECT * FROM Pagos ORDER BY fecha DESC")->fetch_all(
                     <tr class="border-b last:border-0">
                         <td class="px-3 py-2"><?= htmlspecialchars($pago['descripcion']) ?></td>
                         <td class="px-3 py-2">$<?= number_format($pago['monto'],2) ?></td>
-                        <td class="px-3 py-2">$<?= htmlspecialchars($pago['Metodo']) ?></td>
+                        <td class="px-3 py-2"><?= htmlspecialchars($pago['Metodo']) ?></td>
                         <td class="px-3 py-2"><?= htmlspecialchars($pago['fecha']) ?></td>
                     </tr>
                 <?php endforeach; else: ?>
