@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </nav>
 
-<div class="bg-indigo-700 pt-8 pb-20 px-8 rounded-b-3xl shadow-xl -mt-1 relative z-0">
+<div class="bg-indigo-500 pt-8 pb-10 px-8 rounded-b-3xl shadow-xl -mt-1 relative z-0">
     <h2 class="text-white text-3xl font-bold mb-3">Agregar Gasto</h2>
 </div>
 

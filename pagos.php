@@ -32,12 +32,12 @@ $pagos = $conexion->query("SELECT * FROM Pagos ORDER BY fecha DESC")->fetch_all(
     </div>
 </nav>
 
-<div class="bg-indigo-700 pt-8 pb-24 px-8 rounded-b-3xl shadow-xl -mt-1 relative z-0">
+<div class="bg-indigo-500 pt-8 pb-10 px-8 rounded-b-3xl shadow-xl -mt-1 relative z-0">
     <h2 class="text-white text-3xl font-bold mb-3">Abonos/Pagos</h2>
 </div>
 
-<main class="-mt-16 px-8">
-    <div class="bg-white rounded-xl shadow-lg p-8 min-h-[350px] mb-10">
+<main class="-mt-0 px-8">
+    <div class="bg-white rounded-xl shadow-lg p-20 min-h-[350px] mb-10">
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-2xl font-semibold text-indigo-700">Lista de Abonos</h3>
             <a href="addPago.php" class="bg-indigo-700 px-5 py-2 rounded text-white hover:bg-indigo-800 transition font-semibold">Agregar Abono</a>
