@@ -4,7 +4,7 @@ include 'config.php';
 // Procesar el formulario al enviar
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $descripcion = $_POST['descripcion'] ?? '';
-    $metodo = $_POST['metodo'];
+    $metodo = $_POST['metodo'] ?? 'Efectivo';
     $monto = $_POST['monto'] ?? 0;
     $fecha = $_POST['fecha'] ?? date('Y-m-d');
 
@@ -12,8 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("sds", $descripcion, $monto, $metodo, $fecha);
     $stmt->execute();
 
-    header("Location: pagos.php");
-    exit;
+    if ($conexion->query($sql) === TRUE) {
+        header('Location: pagos.php');
+    } else {
+        echo "Error: " . $conexion->error;
+    }
 }
 ?>
 <!DOCTYPE html>
