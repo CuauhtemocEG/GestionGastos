@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("sds", $descripcion, $monto, $metodo, $fecha);
     $stmt->execute();
 
-    header("Location: pagos.php?success=1");
+    header("Location: pagos.php");
     exit;
 }
 ?>
