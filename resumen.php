@@ -1,7 +1,7 @@
 <?php
 include 'config.php';
 $totalGastos = $conexion->query("SELECT SUM(Monto) as total FROM Gastos")->fetch_assoc()['total'] ?? 0;
-$totalPagos  = $conexion->query("SELECT SUM(monto) as total FROM pagos")->fetch_assoc()['total'] ?? 0;
+$totalPagos  = $conexion->query("SELECT SUM(monto) as total FROM Pagos")->fetch_assoc()['total'] ?? 0;
 $saldo = $totalPagos - $totalGastos;
 ?>
 <!DOCTYPE html>
