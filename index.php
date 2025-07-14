@@ -4,47 +4,56 @@ include 'config.php';
 $fechaInicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
 $fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');
 
-function obtenerGastos($conexion, $fechaInicio, $fechaFin) {
+function obtenerGastos($conexion, $fechaInicio, $fechaFin)
+{
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Metodo='Tarjeta'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-function obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin) {
+function obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin)
+{
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Metodo='Efectivo'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-function obtenerGastosTotales($conexion, $fechaInicio, $fechaFin) {
+function obtenerGastosTotales($conexion, $fechaInicio, $fechaFin)
+{
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-function calcularTotal($gastos) {
+function calcularTotal($gastos)
+{
     $total = 0;
     foreach ($gastos as $gasto) $total += $gasto['Monto'];
     return $total;
 }
-function obtenerGastosFijos($conexion, $fechaInicio, $fechaFin) {
+function obtenerGastosFijos($conexion, $fechaInicio, $fechaFin)
+{
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Fijo'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-function obtenerGastosCentral($conexion, $fechaInicio, $fechaFin) {
+function obtenerGastosCentral($conexion, $fechaInicio, $fechaFin)
+{
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Central'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-function obtenerGastosSitio($conexion, $fechaInicio, $fechaFin) {
+function obtenerGastosSitio($conexion, $fechaInicio, $fechaFin)
+{
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Mercado'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-function obtenerGastosMantenimiento($conexion, $fechaInicio, $fechaFin) {
+function obtenerGastosMantenimiento($conexion, $fechaInicio, $fechaFin)
+{
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Mantenimiento'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
-function obtenerGastosInversiones($conexion, $fechaInicio, $fechaFin) {
+function obtenerGastosInversiones($conexion, $fechaInicio, $fechaFin)
+{
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Inversiones'";
     $resultado = $conexion->query($sql);
     return $resultado->fetch_all(MYSQLI_ASSOC);
@@ -84,20 +93,49 @@ $dataMetodo = [
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Gastos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Alpine.js para collapse -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
-<body class="bg-gray-100 font-sans">
+
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- NAVBAR -->
+    <nav class="bg-indigo-700 rounded-b-2xl px-8 py-4 flex items-center justify-between shadow-lg relative z-10">
+        <div class="flex items-center gap-8">
+            <span class="text-2xl font-bold text-white flex items-center gap-2">
+                <svg class="w-8 h-8 inline-block text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M12 8v4l3 3"></path>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"></circle>
+                </svg>
+                GastosApp
+            </span>
+            <a href="index.php" class="px-6 py-2 rounded-lg bg-white text-indigo-700 font-semibold shadow hover:bg-indigo-100 focus:bg-indigo-100 transition">Inicio</a>
+            <a href="addExpenses.php" class="text-white hover:underline">Agregar Gasto</a>
+            <a href="pagos.php" class="text-white hover:underline">Abonos</a>
+            <a href="resumen.php" class="text-white hover:underline">Resumen</a>
+        </div>
+        <div class="flex items-center gap-4">
+            <input type="text" placeholder="Buscar" class="rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 w-56">
+            <button class="text-white hover:text-indigo-200 text-2xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M15 17h5l-1.405-1.405M19 13V8a7 7 0 10-14 0v5l-1.405 1.405A2.032 2.032 0 004 19h16a2.032 2.032 0 001.405-3.405L20 17z" />
+                </svg>
+            </button>
+            <img src="https://ui-avatars.com/api/?name=Usuario&background=4f46e5&color=fff" class="rounded-full w-9 h-9 shadow border-2 border-white" alt="Avatar">
+        </div>
+    </nav>
+
     <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-xl p-8 mt-8 mb-8">
         <header class="mb-10">
             <h1 class="text-4xl font-bold text-center text-blue-700 flex items-center justify-center gap-3">
-                <svg class="w-8 h-8 inline-block text-blue-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3"></path><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"></circle></svg>
+                <svg class="w-8 h-8 inline-block text-blue-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M12 8v4l3 3"></path>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"></circle>
+                </svg>
                 Gestión de Gastos
             </h1>
             <p class="text-center text-gray-500 mt-2">Visualiza y controla tus gastos de manera ordenada y profesional.</p>
@@ -135,19 +173,19 @@ $dataMetodo = [
         <!-- Collapse Categorías -->
         <div x-data="{ openCollapse: null }">
             <div class="flex flex-wrap gap-2 mb-6">
-                <button @click="openCollapse = (openCollapse === 'fijo' ? null : 'fijo')" 
+                <button @click="openCollapse = (openCollapse === 'fijo' ? null : 'fijo')"
                     :class="openCollapse === 'fijo' ? 'bg-blue-700 text-white' : 'border border-blue-700 text-blue-700'"
                     class="px-4 py-2 rounded transition font-semibold">Gasto Fijo</button>
-                <button @click="openCollapse = (openCollapse === 'central' ? null : 'central')" 
+                <button @click="openCollapse = (openCollapse === 'central' ? null : 'central')"
                     :class="openCollapse === 'central' ? 'bg-blue-700 text-white' : 'border border-blue-700 text-blue-700'"
                     class="px-4 py-2 rounded transition font-semibold">Central de Abasto</button>
-                <button @click="openCollapse = (openCollapse === 'sitio' ? null : 'sitio')" 
+                <button @click="openCollapse = (openCollapse === 'sitio' ? null : 'sitio')"
                     :class="openCollapse === 'sitio' ? 'bg-blue-700 text-white' : 'border border-blue-700 text-blue-700'"
                     class="px-4 py-2 rounded transition font-semibold">Mercado</button>
-                <button @click="openCollapse = (openCollapse === 'mantenimiento' ? null : 'mantenimiento')" 
+                <button @click="openCollapse = (openCollapse === 'mantenimiento' ? null : 'mantenimiento')"
                     :class="openCollapse === 'mantenimiento' ? 'bg-blue-700 text-white' : 'border border-blue-700 text-blue-700'"
                     class="px-4 py-2 rounded transition font-semibold">Mantenimiento</button>
-                <button @click="openCollapse = (openCollapse === 'inversiones' ? null : 'inversiones')" 
+                <button @click="openCollapse = (openCollapse === 'inversiones' ? null : 'inversiones')"
                     :class="openCollapse === 'inversiones' ? 'bg-blue-700 text-white' : 'border border-blue-700 text-blue-700'"
                     class="px-4 py-2 rounded transition font-semibold">Inversiones</button>
             </div>
@@ -160,7 +198,7 @@ $dataMetodo = [
                 ?>
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-lg font-semibold text-blue-700">Gastos Fijos</span>
-                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($total,2) ?></span>
+                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($total, 2) ?></span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm border rounded-lg">
@@ -174,21 +212,22 @@ $dataMetodo = [
                             </tr>
                         </thead>
                         <tbody class="bg-white">
-                        <?php if (count($lista) > 0): foreach ($lista as $gasto): ?>
-                            <tr class="border-b last:border-0">
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
-                                <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'],2) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                <td class="px-3 py-2">
-                                    <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; else: ?>
-                            <tr>
-                                <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
+                            <?php if (count($lista) > 0): foreach ($lista as $gasto): ?>
+                                    <tr class="border-b last:border-0">
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
+                                        <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
+                                        <td class="px-3 py-2">
+                                            <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach;
+                            else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -201,7 +240,7 @@ $dataMetodo = [
                 ?>
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-lg font-semibold text-blue-700">Central de Abasto</span>
-                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($total,2) ?></span>
+                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($total, 2) ?></span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm border rounded-lg">
@@ -215,21 +254,22 @@ $dataMetodo = [
                             </tr>
                         </thead>
                         <tbody class="bg-white">
-                        <?php if (count($lista) > 0): foreach ($lista as $gasto): ?>
-                            <tr class="border-b last:border-0">
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
-                                <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'],2) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                <td class="px-3 py-2">
-                                    <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; else: ?>
-                            <tr>
-                                <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
+                            <?php if (count($lista) > 0): foreach ($lista as $gasto): ?>
+                                    <tr class="border-b last:border-0">
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
+                                        <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
+                                        <td class="px-3 py-2">
+                                            <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach;
+                            else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -242,7 +282,7 @@ $dataMetodo = [
                 ?>
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-lg font-semibold text-blue-700">Mercado</span>
-                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($total,2) ?></span>
+                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($total, 2) ?></span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm border rounded-lg">
@@ -256,21 +296,22 @@ $dataMetodo = [
                             </tr>
                         </thead>
                         <tbody class="bg-white">
-                        <?php if (count($lista) > 0): foreach ($lista as $gasto): ?>
-                            <tr class="border-b last:border-0">
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
-                                <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'],2) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                <td class="px-3 py-2">
-                                    <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; else: ?>
-                            <tr>
-                                <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
+                            <?php if (count($lista) > 0): foreach ($lista as $gasto): ?>
+                                    <tr class="border-b last:border-0">
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
+                                        <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
+                                        <td class="px-3 py-2">
+                                            <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach;
+                            else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -283,7 +324,7 @@ $dataMetodo = [
                 ?>
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-lg font-semibold text-blue-700">Mantenimiento</span>
-                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($total,2) ?></span>
+                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($total, 2) ?></span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm border rounded-lg">
@@ -297,21 +338,22 @@ $dataMetodo = [
                             </tr>
                         </thead>
                         <tbody class="bg-white">
-                        <?php if (count($lista) > 0): foreach ($lista as $gasto): ?>
-                            <tr class="border-b last:border-0">
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
-                                <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'],2) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                <td class="px-3 py-2">
-                                    <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; else: ?>
-                            <tr>
-                                <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
+                            <?php if (count($lista) > 0): foreach ($lista as $gasto): ?>
+                                    <tr class="border-b last:border-0">
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
+                                        <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
+                                        <td class="px-3 py-2">
+                                            <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach;
+                            else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -324,7 +366,7 @@ $dataMetodo = [
                 ?>
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-lg font-semibold text-blue-700">Inversiones</span>
-                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($total,2) ?></span>
+                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($total, 2) ?></span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm border rounded-lg">
@@ -338,21 +380,22 @@ $dataMetodo = [
                             </tr>
                         </thead>
                         <tbody class="bg-white">
-                        <?php if (count($lista) > 0): foreach ($lista as $gasto): ?>
-                            <tr class="border-b last:border-0">
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
-                                <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'],2) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                <td class="px-3 py-2">
-                                    <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; else: ?>
-                            <tr>
-                                <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
+                            <?php if (count($lista) > 0): foreach ($lista as $gasto): ?>
+                                    <tr class="border-b last:border-0">
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
+                                        <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
+                                        <td class="px-3 py-2">
+                                            <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach;
+                            else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -365,7 +408,7 @@ $dataMetodo = [
             <div class="bg-white border border-blue-100 rounded-lg p-4">
                 <div class="flex items-center justify-between mb-3">
                     <span class="font-semibold text-blue-700">Gastos con Tarjeta</span>
-                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($totalGastos,2) ?></span>
+                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($totalGastos, 2) ?></span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm border rounded-lg">
@@ -379,21 +422,22 @@ $dataMetodo = [
                             </tr>
                         </thead>
                         <tbody class="bg-white">
-                        <?php if (count($gastos) > 0): foreach ($gastos as $gasto): ?>
-                            <tr class="border-b last:border-0">
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
-                                <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'],2) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                <td class="px-3 py-2">
-                                    <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; else: ?>
-                            <tr>
-                                <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
+                            <?php if (count($gastos) > 0): foreach ($gastos as $gasto): ?>
+                                    <tr class="border-b last:border-0">
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
+                                        <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
+                                        <td class="px-3 py-2">
+                                            <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach;
+                            else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -401,7 +445,7 @@ $dataMetodo = [
             <div class="bg-white border border-blue-100 rounded-lg p-4">
                 <div class="flex items-center justify-between mb-3">
                     <span class="font-semibold text-blue-700">Gastos en Efectivo</span>
-                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($totalGastosEfectivo,2) ?></span>
+                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($totalGastosEfectivo, 2) ?></span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm border rounded-lg">
@@ -415,21 +459,22 @@ $dataMetodo = [
                             </tr>
                         </thead>
                         <tbody class="bg-white">
-                        <?php if (count($gastosEfectivo) > 0): foreach ($gastosEfectivo as $gasto): ?>
-                            <tr class="border-b last:border-0">
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
-                                <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'],2) ?></td>
-                                <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                <td class="px-3 py-2">
-                                    <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; else: ?>
-                            <tr>
-                                <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
-                            </tr>
-                        <?php endif; ?>
+                            <?php if (count($gastosEfectivo) > 0): foreach ($gastosEfectivo as $gasto): ?>
+                                    <tr class="border-b last:border-0">
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
+                                        <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
+                                        <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
+                                        <td class="px-3 py-2">
+                                            <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach;
+                            else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -438,7 +483,7 @@ $dataMetodo = [
         <div class="bg-white border border-blue-100 rounded-lg p-4 mb-8">
             <div class="flex items-center justify-between mb-3">
                 <span class="font-semibold text-blue-700">Gastos Totales</span>
-                <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($totalGastosAll,2) ?></span>
+                <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-base">Total: $<?= number_format($totalGastosAll, 2) ?></span>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm border rounded-lg">
@@ -452,21 +497,22 @@ $dataMetodo = [
                         </tr>
                     </thead>
                     <tbody class="bg-white">
-                    <?php if (count($gastosTotales) > 0): foreach ($gastosTotales as $gasto): ?>
-                        <tr class="border-b last:border-0">
-                            <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
-                            <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
-                            <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'],2) ?></td>
-                            <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                            <td class="px-3 py-2">
-                                <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; else: ?>
-                        <tr>
-                            <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
-                        </tr>
-                    <?php endif; ?>
+                        <?php if (count($gastosTotales) > 0): foreach ($gastosTotales as $gasto): ?>
+                                <tr class="border-b last:border-0">
+                                    <td class="px-3 py-2"><?= htmlspecialchars($gasto['Descripcion']) ?></td>
+                                    <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
+                                    <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
+                                    <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
+                                    <td class="px-3 py-2">
+                                        <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach;
+                        else: ?>
+                            <tr>
+                                <td colspan="5" class="text-center text-gray-400 py-3">No hay gastos registrados en este rango de fechas.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -474,55 +520,62 @@ $dataMetodo = [
         <div class="flex justify-end">
             <a href="addExpenses.php" class="inline-block px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition font-semibold">Agregar Nuevo Gasto</a>
         </div>
-        <footer class="mt-10 text-center text-gray-400 text-sm">
+        <footer class="mt-12 text-center text-gray-400 text-sm">
             &copy; <?= date('Y') ?> Gestión de Gastos · Desarrollado por CuauhtemocEG
-        </footer>
-    </div>
-    <script>
-        const ctxMetodo = document.getElementById('graficoMetodo').getContext('2d');
-        new Chart(ctxMetodo, {
-            type: 'doughnut',
-            data: {
-                labels: <?= json_encode($labelsMetodo) ?>,
-                datasets: [{
-                    data: <?= json_encode($dataMetodo) ?>,
-                    backgroundColor: ["#2563eb", "#059669"],
-                    borderColor: "#fff",
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' }
-                }
-            }
-        });
-
-        const ctxTipos = document.getElementById('graficoTipos').getContext('2d');
-        new Chart(ctxTipos, {
-            type: 'bar',
-            data: {
-                labels: <?= json_encode($labelsTipos) ?>,
-                datasets: [{
-                    data: <?= json_encode($dataTipos) ?>,
-                    label: "Total por categoría",
-                    backgroundColor: [
-                        "#2563eb", "#059669", "#ea580c", "#facc15", "#7c3aed"
-                    ],
-                    borderRadius: 7,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false }
+        </footer
+            </div>
+        <script>
+            const ctxMetodo = document.getElementById('graficoMetodo').getContext('2d');
+            new Chart(ctxMetodo, {
+                type: 'doughnut',
+                data: {
+                    labels: <?= json_encode($labelsMetodo) ?>,
+                    datasets: [{
+                        data: <?= json_encode($dataMetodo) ?>,
+                        backgroundColor: ["#2563eb", "#059669"],
+                        borderColor: "#fff",
+                        borderWidth: 2
+                    }]
                 },
-                scales: {
-                    y: { beginAtZero: true }
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
                 }
-            }
-        });
-    </script>
+            });
+
+            const ctxTipos = document.getElementById('graficoTipos').getContext('2d');
+            new Chart(ctxTipos, {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode($labelsTipos) ?>,
+                    datasets: [{
+                        data: <?= json_encode($dataTipos) ?>,
+                        label: "Total por categoría",
+                        backgroundColor: [
+                            "#2563eb", "#059669", "#ea580c", "#facc15", "#7c3aed"
+                        ],
+                        borderRadius: 7,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        </script>
 </body>
+
 </html>
