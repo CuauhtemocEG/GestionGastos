@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2 class="text-white text-3xl font-bold mb-3">Agregar Gasto</h2>
 </div>
 
-<main class="-mt-16 px-8">
+<main class="-mt-0 px-8">
     <div class="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-8 mb-10">
         <form method="POST" class="space-y-6">
             <div>
