@@ -1,6 +1,6 @@
 <?php
 include 'config.php';
-$pagos = $conexion->query("SELECT * FROM pagos ORDER BY fecha DESC")->fetch_all(MYSQLI_ASSOC);
+$pagos = $conexion->query("SELECT * FROM Pagos ORDER BY fecha DESC")->fetch_all(MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="es">
