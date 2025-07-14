@@ -119,15 +119,6 @@ $dataMetodo = [
             <a href="pagos.php" class="text-white hover:underline">Abonos</a>
             <a href="resumen.php" class="text-white hover:underline">Resumen</a>
         </div>
-        <div class="flex items-center gap-4">
-            <input type="text" placeholder="Buscar" class="rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 w-56">
-            <button class="text-white hover:text-indigo-200 text-2xl">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M15 17h5l-1.405-1.405M19 13V8a7 7 0 10-14 0v5l-1.405 1.405A2.032 2.032 0 004 19h16a2.032 2.032 0 001.405-3.405L20 17z" />
-                </svg>
-            </button>
-            <img src="https://ui-avatars.com/api/?name=Usuario&background=4f46e5&color=fff" class="rounded-full w-9 h-9 shadow border-2 border-white" alt="Avatar">
-        </div>
     </nav>
     <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-xl p-8 mt-8 mb-8">
         <header class="mb-10">

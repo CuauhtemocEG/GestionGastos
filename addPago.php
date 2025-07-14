@@ -39,10 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href="pagos.php" class="px-6 py-2 rounded-lg bg-white text-indigo-700 font-semibold shadow hover:bg-indigo-100 focus:bg-indigo-100 transition">Abonos</a>
         <a href="resumen.php" class="text-white hover:underline">Resumen</a>
     </div>
-    <div class="flex items-center gap-4">
-        <input type="text" placeholder="Buscar" class="rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 w-56">
-        <img src="https://ui-avatars.com/api/?name=Usuario&background=4f46e5&color=fff" class="rounded-full w-9 h-9 shadow border-2 border-white" alt="Avatar">
-    </div>
 </nav>
 
 <div class="bg-indigo-500 pt-8 pb-10 px-8 rounded-b-3xl shadow-xl -mt-1 relative z-0">
