@@ -4,11 +4,12 @@ include 'config.php';
 // Procesar el formulario al enviar
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $descripcion = $_POST['descripcion'] ?? '';
+    $metodo = $_POST['metodo'] ?? 'Efectivo';
     $monto = $_POST['monto'] ?? 0;
     $fecha = $_POST['fecha'] ?? date('Y-m-d');
 
-    $stmt = $conexion->prepare("INSERT INTO Pagos (descripcion, monto, fecha) VALUES (?, ?, ?)");
-    $stmt->bind_param("sds", $descripcion, $monto, $fecha);
+    $stmt = $conexion->prepare("INSERT INTO Pagos (descripcion, monto, Metodo, fecha) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("sds", $descripcion, $monto, $metodo, $fecha);
     $stmt->execute();
 
     header("Location: pagos.php?success=1");
@@ -55,6 +56,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div>
                 <label class="block font-medium text-gray-700 mb-1">Monto</label>
                 <input type="number" step="0.01" name="monto" required class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
+            </div>
+            <div>
+                <label class="block font-medium text-gray-700 mb-1">Método de Pago</label>
+                <select name="metodo" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                </select>
             </div>
             <div>
                 <label class="block font-medium text-gray-700 mb-1">Fecha</label>

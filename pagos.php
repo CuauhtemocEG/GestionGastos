@@ -44,6 +44,7 @@ $pagos = $conexion->query("SELECT * FROM Pagos ORDER BY fecha DESC")->fetch_all(
                     <tr>
                         <th class="px-3 py-2">Descripción</th>
                         <th class="px-3 py-2">Monto</th>
+                        <th class="px-3 py-2">Método de pago</th>
                         <th class="px-3 py-2">Fecha</th>
                     </tr>
                 </thead>
@@ -51,7 +52,8 @@ $pagos = $conexion->query("SELECT * FROM Pagos ORDER BY fecha DESC")->fetch_all(
                 <?php if (count($pagos) > 0): foreach ($pagos as $pago): ?>
                     <tr class="border-b last:border-0">
                         <td class="px-3 py-2"><?= htmlspecialchars($pago['descripcion']) ?></td>
-                        <td class="px-3 py-2 text-right">$<?= number_format($pago['monto'],2) ?></td>
+                        <td class="px-3 py-2">$<?= number_format($pago['monto'],2) ?></td>
+                        <td class="px-3 py-2">$<?= htmlspecialchars($pago['Metodo']) ?></td>
                         <td class="px-3 py-2"><?= htmlspecialchars($pago['fecha']) ?></td>
                     </tr>
                 <?php endforeach; else: ?>
