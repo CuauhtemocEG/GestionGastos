@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fecha = $_POST['fecha'] ?? date('Y-m-d');
 
     $stmt = $conexion->prepare("INSERT INTO Pagos (descripcion, monto, Metodo, fecha) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("sds", $descripcion, $monto, $metodo, $fecha);
+    $stmt->bind_param("sdss", $descripcion, $monto, $metodo, $fecha);
     $stmt->execute();
 
     if ($conexion->query($sql) === TRUE) {
