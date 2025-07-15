@@ -1,7 +1,6 @@
 <?php
 include 'config.php';
 
-// Procesar el formulario al enviar
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $descripcion = $_POST['descripcion'] ?? '';
     $metodo = $_POST['metodo'] ?? 'Efectivo';
