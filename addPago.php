@@ -11,11 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("sdss", $descripcion, $monto, $metodo, $fecha);
     $stmt->execute();
 
-    if ($conexion->query($sql) === TRUE) {
-        header('Location: pagos.php');
-    } else {
-        echo "Error: " . $conexion->error;
-    }
+    header("Location: pagos.php");
+    exit;
 }
 ?>
 <!DOCTYPE html>
