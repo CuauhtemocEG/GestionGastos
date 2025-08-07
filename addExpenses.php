@@ -65,14 +65,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div>
                 <label class="block font-medium text-gray-700 mb-1">Método de Pago</label>
-                <select name="metodo" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
+                <select name="typeExpense" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
                     <option value="Efectivo">Efectivo</option>
                     <option value="Tarjeta">Tarjeta</option>
                 </select>
             </div>
             <div>
                 <label class="block font-medium text-gray-700 mb-1">Tipo de Gasto</label>
-                <select name="tipo" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
+                <select name="tipoGasto" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
                     <option value="General">General</option>
                     <option value="Fijo">Fijo</option>
                     <option value="Central">Central</option>

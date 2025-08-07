@@ -1,6 +1,32 @@
 <?php
 include 'config.php';
 $pagos = $conexion->query("SELECT * FROM Pagos ORDER BY fecha DESC")->fetch_all(MYSQLI_ASSOC);
+// Manejo de edición
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['edit_id'])) {
+        $id = intval($_POST['edit_id']);
+        $descripcion = $_POST['edit_descripcion'];
+        $monto = floatval($_POST['edit_monto']);
+        $metodo = $_POST['edit_metodo'];
+        $fecha = $_POST['edit_fecha'];
+        $stmt = $conexion->prepare("UPDATE Pagos SET descripcion=?, monto=?, Metodo=?, fecha=? WHERE id= ?");
+        $stmt->bind_param('sdssi', $descripcion, $monto, $metodo, $fecha, $id);
+        $stmt->execute();
+        $stmt->close();
+        header('Location: pagos.php');
+        exit;
+    }
+    // Manejo de eliminación
+    if (isset($_POST['delete_id'])) {
+        $id = intval($_POST['delete_id']);
+        $stmt = $conexion->prepare("DELETE FROM Pagos WHERE id=?");
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $stmt->close();
+        header('Location: pagos.php');
+        exit;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -46,6 +72,7 @@ $pagos = $conexion->query("SELECT * FROM Pagos ORDER BY fecha DESC")->fetch_all(
                         <th class="px-3 py-2">Monto</th>
                         <th class="px-3 py-2">Método de pago</th>
                         <th class="px-3 py-2">Fecha</th>
+                        <th class="px-3 py-2">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white">
@@ -55,10 +82,24 @@ $pagos = $conexion->query("SELECT * FROM Pagos ORDER BY fecha DESC")->fetch_all(
                         <td class="px-3 py-2">$<?= number_format($pago['monto'],2) ?></td>
                         <td class="px-3 py-2"><?= htmlspecialchars($pago['Metodo']) ?></td>
                         <td class="px-3 py-2"><?= htmlspecialchars($pago['fecha']) ?></td>
+                        <td class="px-3 py-2 flex gap-2">
+                            <button class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded edit-btn" 
+                                data-id="<?= $pago['id'] ?>" 
+                                data-descripcion="<?= htmlspecialchars($pago['descripcion'], ENT_QUOTES) ?>" 
+                                data-monto="<?= $pago['monto'] ?>" 
+                                data-metodo="<?= htmlspecialchars($pago['Metodo'], ENT_QUOTES) ?>" 
+                                data-fecha="<?= $pago['fecha'] ?>">
+                                Editar
+                            </button>
+                            <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded delete-btn" 
+                                data-id="<?= $pago['id'] ?>">
+                                Eliminar
+                            </button>
+                        </td>
                     </tr>
                 <?php endforeach; else: ?>
                     <tr>
-                        <td colspan="3" class="text-center text-gray-400 py-3">No hay abonos registrados.</td>
+                        <td colspan="5" class="text-center text-gray-400 py-3">No hay abonos registrados.</td>
                     </tr>
                 <?php endif; ?>
                 </tbody>
@@ -69,5 +110,79 @@ $pagos = $conexion->query("SELECT * FROM Pagos ORDER BY fecha DESC")->fetch_all(
 <footer class="mt-12 text-center text-gray-400 text-sm">
     &copy; <?= date('Y') ?> Gestión de Gastos · Desarrollado por CuauhtemocEG
 </footer>
+</body>
+
+<!-- Modal Editar -->
+<div id="modalEdit" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+    <h3 class="text-xl font-bold mb-4 text-indigo-700">Editar Abono</h3>
+    <form method="POST" id="editForm">
+      <input type="hidden" name="edit_id" id="edit_id">
+      <div class="mb-4">
+        <label class="block text-sm font-semibold mb-1">Descripción</label>
+        <input type="text" name="edit_descripcion" id="edit_descripcion" class="w-full border rounded px-3 py-2" required>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-semibold mb-1">Monto</label>
+        <input type="number" step="0.01" name="edit_monto" id="edit_monto" class="w-full border rounded px-3 py-2" required>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-semibold mb-1">Método de pago</label>
+        <input type="text" name="edit_metodo" id="edit_metodo" class="w-full border rounded px-3 py-2" required>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-semibold mb-1">Fecha</label>
+        <input type="date" name="edit_fecha" id="edit_fecha" class="w-full border rounded px-3 py-2" required>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" id="closeEditModal" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancelar</button>
+        <button type="submit" class="px-4 py-2 rounded bg-indigo-700 text-white hover:bg-indigo-800">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Eliminar -->
+<div id="modalDelete" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+    <h3 class="text-xl font-bold mb-4 text-red-600">¿Eliminar abono?</h3>
+    <form method="POST" id="deleteForm">
+      <input type="hidden" name="delete_id" id="delete_id">
+      <p class="mb-6">¿Estás seguro de que deseas eliminar este abono? Esta acción no se puede deshacer.</p>
+      <div class="flex justify-end gap-2">
+        <button type="button" id="closeDeleteModal" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancelar</button>
+        <button type="submit" class="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600">Eliminar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Editar
+document.querySelectorAll('.edit-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.getElementById('edit_id').value = this.dataset.id;
+    document.getElementById('edit_descripcion').value = this.dataset.descripcion;
+    document.getElementById('edit_monto').value = this.dataset.monto;
+    document.getElementById('edit_metodo').value = this.dataset.metodo;
+    document.getElementById('edit_fecha').value = this.dataset.fecha;
+    document.getElementById('modalEdit').classList.remove('hidden');
+  });
+});
+document.getElementById('closeEditModal').onclick = function() {
+  document.getElementById('modalEdit').classList.add('hidden');
+};
+
+// Eliminar
+document.querySelectorAll('.delete-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.getElementById('delete_id').value = this.dataset.id;
+    document.getElementById('modalDelete').classList.remove('hidden');
+  });
+});
+document.getElementById('closeDeleteModal').onclick = function() {
+  document.getElementById('modalDelete').classList.add('hidden');
+};
+</script>
 </body>
 </html>
