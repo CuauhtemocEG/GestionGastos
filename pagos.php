@@ -128,8 +128,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
       <div class="mb-4">
         <label class="block text-sm font-semibold mb-1">Método de pago</label>
-        <input type="text" name="edit_metodo" id="edit_metodo" class="w-full border rounded px-3 py-2" required>
+        <select name="edit_metodo" id="edit_metodo" class="w-full border rounded px-3 py-2" required>
+          <option value="Efectivo">Efectivo</option>
+          <option value="Tarjeta">Tarjeta</option>
+        </select>
       </div>
+
       <div class="mb-4">
         <label class="block text-sm font-semibold mb-1">Fecha</label>
         <input type="date" name="edit_fecha" id="edit_fecha" class="w-full border rounded px-3 py-2" required>
@@ -172,6 +176,20 @@ document.querySelectorAll('.edit-btn').forEach(btn => {
 document.getElementById('closeEditModal').onclick = function() {
   document.getElementById('modalEdit').classList.add('hidden');
 };
+
+// Editar
+document.querySelectorAll('.edit-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.getElementById('edit_id').value = this.dataset.id;
+    document.getElementById('edit_descripcion').value = this.dataset.descripcion;
+    document.getElementById('edit_monto').value = this.dataset.monto;
+    // Seleccionar la opción correcta en el select
+    const metodoSelect = document.getElementById('edit_metodo');
+    metodoSelect.value = this.dataset.metodo;
+    document.getElementById('edit_fecha').value = this.dataset.fecha;
+    document.getElementById('modalEdit').classList.remove('hidden');
+  });
+});
 
 // Eliminar
 document.querySelectorAll('.delete-btn').forEach(btn => {
