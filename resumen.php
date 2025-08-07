@@ -14,8 +14,9 @@ $saldo = $totalPagos - $totalGastos;
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-<nav class="bg-indigo-700 rounded-b-2xl px-8 py-4 flex items-center justify-between shadow-lg relative z-10">
-    <div class="flex items-center gap-8">
+
+<nav class="bg-indigo-700 rounded-b-2xl px-4 sm:px-8 py-4 shadow-lg relative z-10">
+    <div class="flex items-center justify-between">
         <span class="text-2xl font-bold text-white flex items-center gap-2">
             <svg class="w-8 h-8 inline-block text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M12 8v4l3 3"></path>
@@ -23,12 +24,34 @@ $saldo = $totalPagos - $totalGastos;
             </svg>
             GastosApp
         </span>
-        <a href="index.php" class="text-white hover:underline">Inicio</a>
-        <a href="addExpenses.php" class="text-white hover:underline">Agregar Gasto</a>
-        <a href="pagos.php" class="text-white hover:underline">Abonos</a>
-        <a href="resumen.php" class="px-6 py-2 rounded-lg bg-white text-indigo-700 font-semibold shadow hover:bg-indigo-100 focus:bg-indigo-100 transition">Resumen</a>
+        <button id="nav-toggle" class="sm:hidden text-white focus:outline-none" aria-label="Abrir menú">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+    </div>
+    <div id="nav-menu" class="flex-col sm:flex-row sm:flex items-center gap-6 sm:gap-8 mt-4 sm:mt-0 hidden sm:flex">
+        <a href="index.php" class="text-white hover:underline block py-2 sm:py-0">Inicio</a>
+        <a href="addExpenses.php" class="text-white hover:underline block py-2 sm:py-0">Agregar Gasto</a>
+        <a href="pagos.php" class="text-white hover:underline block py-2 sm:py-0">Abonos</a>
+        <a href="resumen.php" class="px-6 py-2 rounded-lg bg-white text-indigo-700 font-semibold shadow hover:bg-indigo-100 focus:bg-indigo-100 transition block sm:inline-block">Resumen</a>
     </div>
 </nav>
+<script>
+    // Navbar hamburguesa
+    const navToggle = document.getElementById('nav-toggle');
+    const navMenu = document.getElementById('nav-menu');
+    navToggle.addEventListener('click', () => {
+        navMenu.classList.toggle('hidden');
+    });
+</script>
+</style>
+  /* Tablas responsivas */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+</style>
 
 <div class="bg-indigo-500 pt-8 pb-10 px-8 rounded-b-3xl shadow-xl -mt-1 relative z-0">
     <h2 class="text-white text-3xl font-bold mb-3">Resumen</h2>
