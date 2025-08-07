@@ -550,7 +550,15 @@ $dataMetodo = [
                                     <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
                                     <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
                                     <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                    <td class="px-3 py-2">
+                                    <td class="px-3 py-2 flex gap-1">
+                                        <button class="inline-block px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition text-xs edit-gasto-btn"
+                                            data-id="<?= $gasto['ID'] ?>"
+                                            data-descripcion="<?= htmlspecialchars($gasto['Descripcion'], ENT_QUOTES) ?>"
+                                            data-monto="<?= $gasto['Monto'] ?>"
+                                            data-fecha="<?= $gasto['Fecha'] ?>"
+                                            data-metodo="<?= htmlspecialchars($gasto['Metodo'], ENT_QUOTES) ?>"
+                                            data-tipo="<?= htmlspecialchars($gasto['Tipo'], ENT_QUOTES) ?>"
+                                        >Editar</button>
                                         <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
                                     </td>
                                 </tr>
