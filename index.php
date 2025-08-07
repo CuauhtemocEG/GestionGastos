@@ -4,6 +4,22 @@ include 'config.php';
 $fechaInicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
 $fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');
 
+// Manejo de edición de gastos
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_gasto_id'])) {
+    $id = intval($_POST['edit_gasto_id']);
+    $descripcion = $_POST['edit_gasto_descripcion'];
+    $monto = floatval($_POST['edit_gasto_monto']);
+    $fecha = $_POST['edit_gasto_fecha'];
+    $metodo = $_POST['edit_gasto_metodo'];
+    $tipo = $_POST['edit_gasto_tipo'];
+    $stmt = $conexion->prepare("UPDATE Gastos SET Descripcion=?, Monto=?, Fecha=?, Metodo=?, Tipo=? WHERE ID=?");
+    $stmt->bind_param('sdsssi', $descripcion, $monto, $fecha, $metodo, $tipo, $id);
+    $stmt->execute();
+    $stmt->close();
+    header('Location: index.php?fecha_inicio=' . urlencode($fechaInicio) . '&fecha_fin=' . urlencode($fechaFin));
+    exit;
+}
+
 function obtenerGastos($conexion, $fechaInicio, $fechaFin)
 {
     $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Metodo='Tarjeta'";
@@ -209,7 +225,15 @@ $dataMetodo = [
                                         <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
                                         <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
                                         <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                        <td class="px-3 py-2">
+                                        <td class="px-3 py-2 flex gap-1">
+                                            <button class="inline-block px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition text-xs edit-gasto-btn"
+                                                data-id="<?= $gasto['ID'] ?>"
+                                                data-descripcion="<?= htmlspecialchars($gasto['Descripcion'], ENT_QUOTES) ?>"
+                                                data-monto="<?= $gasto['Monto'] ?>"
+                                                data-fecha="<?= $gasto['Fecha'] ?>"
+                                                data-metodo="<?= htmlspecialchars($gasto['Metodo'], ENT_QUOTES) ?>"
+                                                data-tipo="<?= htmlspecialchars($gasto['Tipo'], ENT_QUOTES) ?>"
+                                            >Editar</button>
                                             <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
                                         </td>
                                     </tr>
@@ -251,7 +275,15 @@ $dataMetodo = [
                                         <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
                                         <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
                                         <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                        <td class="px-3 py-2">
+                                        <td class="px-3 py-2 flex gap-1">
+                                            <button class="inline-block px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition text-xs edit-gasto-btn"
+                                                data-id="<?= $gasto['ID'] ?>"
+                                                data-descripcion="<?= htmlspecialchars($gasto['Descripcion'], ENT_QUOTES) ?>"
+                                                data-monto="<?= $gasto['Monto'] ?>"
+                                                data-fecha="<?= $gasto['Fecha'] ?>"
+                                                data-metodo="<?= htmlspecialchars($gasto['Metodo'], ENT_QUOTES) ?>"
+                                                data-tipo="<?= htmlspecialchars($gasto['Tipo'], ENT_QUOTES) ?>"
+                                            >Editar</button>
                                             <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
                                         </td>
                                     </tr>
@@ -293,7 +325,15 @@ $dataMetodo = [
                                         <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
                                         <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
                                         <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                        <td class="px-3 py-2">
+                                        <td class="px-3 py-2 flex gap-1">
+                                            <button class="inline-block px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition text-xs edit-gasto-btn"
+                                                data-id="<?= $gasto['ID'] ?>"
+                                                data-descripcion="<?= htmlspecialchars($gasto['Descripcion'], ENT_QUOTES) ?>"
+                                                data-monto="<?= $gasto['Monto'] ?>"
+                                                data-fecha="<?= $gasto['Fecha'] ?>"
+                                                data-metodo="<?= htmlspecialchars($gasto['Metodo'], ENT_QUOTES) ?>"
+                                                data-tipo="<?= htmlspecialchars($gasto['Tipo'], ENT_QUOTES) ?>"
+                                            >Editar</button>
                                             <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
                                         </td>
                                     </tr>
@@ -335,7 +375,15 @@ $dataMetodo = [
                                         <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
                                         <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
                                         <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                        <td class="px-3 py-2">
+                                        <td class="px-3 py-2 flex gap-1">
+                                            <button class="inline-block px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition text-xs edit-gasto-btn"
+                                                data-id="<?= $gasto['ID'] ?>"
+                                                data-descripcion="<?= htmlspecialchars($gasto['Descripcion'], ENT_QUOTES) ?>"
+                                                data-monto="<?= $gasto['Monto'] ?>"
+                                                data-fecha="<?= $gasto['Fecha'] ?>"
+                                                data-metodo="<?= htmlspecialchars($gasto['Metodo'], ENT_QUOTES) ?>"
+                                                data-tipo="<?= htmlspecialchars($gasto['Tipo'], ENT_QUOTES) ?>"
+                                            >Editar</button>
                                             <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
                                         </td>
                                     </tr>
@@ -377,7 +425,15 @@ $dataMetodo = [
                                         <td class="px-3 py-2"><?= htmlspecialchars($gasto['Metodo']) ?></td>
                                         <td class="px-3 py-2 text-right">$<?= number_format($gasto['Monto'], 2) ?></td>
                                         <td class="px-3 py-2"><?= htmlspecialchars($gasto['Fecha']) ?></td>
-                                        <td class="px-3 py-2">
+                                        <td class="px-3 py-2 flex gap-1">
+                                            <button class="inline-block px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition text-xs edit-gasto-btn"
+                                                data-id="<?= $gasto['ID'] ?>"
+                                                data-descripcion="<?= htmlspecialchars($gasto['Descripcion'], ENT_QUOTES) ?>"
+                                                data-monto="<?= $gasto['Monto'] ?>"
+                                                data-fecha="<?= $gasto['Fecha'] ?>"
+                                                data-metodo="<?= htmlspecialchars($gasto['Metodo'], ENT_QUOTES) ?>"
+                                                data-tipo="<?= htmlspecialchars($gasto['Tipo'], ENT_QUOTES) ?>"
+                                            >Editar</button>
                                             <a href="deleteExpenses.php?id=<?= $gasto['ID'] ?>" class="inline-block px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition text-xs">Eliminar</a>
                                         </td>
                                     </tr>
@@ -514,6 +570,68 @@ $dataMetodo = [
         <footer class="mt-10 text-center text-gray-400 text-sm">
             &copy; <?= date('Y') ?> Gestión de Gastos · Desarrollado por CuauhtemocEG
         </footer>
+
+        <!-- Modal Editar Gasto -->
+        <div id="modalEditGasto" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+                <h3 class="text-xl font-bold mb-4 text-indigo-700">Editar Gasto</h3>
+                <form method="POST" id="editGastoForm">
+                    <input type="hidden" name="edit_gasto_id" id="edit_gasto_id">
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1">Descripción</label>
+                        <input type="text" name="edit_gasto_descripcion" id="edit_gasto_descripcion" class="w-full border rounded px-3 py-2" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1">Monto</label>
+                        <input type="number" step="0.01" name="edit_gasto_monto" id="edit_gasto_monto" class="w-full border rounded px-3 py-2" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1">Fecha</label>
+                        <input type="date" name="edit_gasto_fecha" id="edit_gasto_fecha" class="w-full border rounded px-3 py-2" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1">Método de Pago</label>
+                        <select name="edit_gasto_metodo" id="edit_gasto_metodo" class="w-full border rounded px-3 py-2" required>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1">Tipo de Gasto</label>
+                        <select name="edit_gasto_tipo" id="edit_gasto_tipo" class="w-full border rounded px-3 py-2" required>
+                            <option value="General">General</option>
+                            <option value="Fijo">Fijo</option>
+                            <option value="Central">Central</option>
+                            <option value="Mercado">Mercado</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Inversiones">Inversiones</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <button type="button" id="closeEditGastoModal" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancelar</button>
+                        <button type="submit" class="px-4 py-2 rounded bg-indigo-700 text-white hover:bg-indigo-800">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+        // Abrir modal y cargar datos
+        document.querySelectorAll('.edit-gasto-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('edit_gasto_id').value = this.dataset.id;
+                document.getElementById('edit_gasto_descripcion').value = this.dataset.descripcion;
+                document.getElementById('edit_gasto_monto').value = this.dataset.monto;
+                document.getElementById('edit_gasto_fecha').value = this.dataset.fecha;
+                document.getElementById('edit_gasto_metodo').value = this.dataset.metodo;
+                document.getElementById('edit_gasto_tipo').value = this.dataset.tipo;
+                document.getElementById('modalEditGasto').classList.remove('hidden');
+            });
+        });
+        document.getElementById('closeEditGastoModal').onclick = function() {
+            document.getElementById('modalEditGasto').classList.add('hidden');
+        };
+        </script>
     </div>
     <script>
         const ctxMetodo = document.getElementById('graficoMetodo').getContext('2d');
