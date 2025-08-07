@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <main class="-mt-0 px-8">
-    <div class="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-8 mb-10">
+    <div class="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8 mb-10 w-full">
         <form method="POST" class="space-y-6">
             <div>
                 <label class="block font-medium text-gray-700 mb-1">Descripción</label>
@@ -81,9 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <option value="Inversiones">Inversiones</option>
                 </select>
             </div>
-            <div class="flex justify-between">
-                <a href="index.php" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-gray-800 font-semibold">Cancelar</a>
-                <button type="submit" class="px-6 py-2 bg-indigo-700 text-white rounded hover:bg-indigo-800 font-semibold">Agregar Gasto</button>
+            <div class="flex flex-col sm:flex-row justify-between gap-2">
+                <a href="index.php" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-gray-800 font-semibold w-full sm:w-auto text-center">Cancelar</a>
+                <button type="submit" class="px-6 py-2 bg-indigo-700 text-white rounded hover:bg-indigo-800 font-semibold w-full sm:w-auto">Agregar Gasto</button>
             </div>
         </form>
     </div>

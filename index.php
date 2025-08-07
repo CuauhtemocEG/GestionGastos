@@ -580,8 +580,8 @@ $dataMetodo = [
         </footer>
 
         <!-- Modal Editar Gasto -->
-        <div id="modalEditGasto" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
-            <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+        <div id="modalEditGasto" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden px-2 py-4 overflow-y-auto">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-md sm:max-w-lg md:max-w-xl p-4 sm:p-6 md:p-8 relative mx-auto overflow-y-auto" style="max-height:95vh;">
                 <h3 class="text-xl font-bold mb-4 text-indigo-700">Editar Gasto</h3>
                 <form method="POST" id="editGastoForm">
                     <input type="hidden" name="edit_gasto_id" id="edit_gasto_id">
@@ -615,9 +615,9 @@ $dataMetodo = [
                             <option value="Inversiones">Inversiones</option>
                         </select>
                     </div>
-                    <div class="flex justify-end gap-2">
-                        <button type="button" id="closeEditGastoModal" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancelar</button>
-                        <button type="submit" class="px-4 py-2 rounded bg-indigo-700 text-white hover:bg-indigo-800">Guardar</button>
+                    <div class="flex flex-col sm:flex-row justify-end gap-2">
+                        <button type="button" id="closeEditGastoModal" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 w-full sm:w-auto">Cancelar</button>
+                        <button type="submit" class="px-4 py-2 rounded bg-indigo-700 text-white hover:bg-indigo-800 w-full sm:w-auto">Guardar</button>
                     </div>
                 </form>
             </div>

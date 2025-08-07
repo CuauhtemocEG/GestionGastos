@@ -113,8 +113,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 <!-- Modal Editar -->
-<div id="modalEdit" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
-  <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+<div id="modalEdit" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden px-2 py-4 overflow-y-auto">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md sm:max-w-lg md:max-w-xl p-4 sm:p-6 md:p-8 relative mx-auto overflow-y-auto" style="max-height:95vh;">
     <h3 class="text-xl font-bold mb-4 text-indigo-700">Editar Abono</h3>
     <form method="POST" id="editForm">
       <input type="hidden" name="edit_id" id="edit_id">
@@ -138,24 +138,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label class="block text-sm font-semibold mb-1">Fecha</label>
         <input type="date" name="edit_fecha" id="edit_fecha" class="w-full border rounded px-3 py-2" required>
       </div>
-      <div class="flex justify-end gap-2">
-        <button type="button" id="closeEditModal" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancelar</button>
-        <button type="submit" class="px-4 py-2 rounded bg-indigo-700 text-white hover:bg-indigo-800">Guardar</button>
+      <div class="flex flex-col sm:flex-row justify-end gap-2">
+        <button type="button" id="closeEditModal" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 w-full sm:w-auto">Cancelar</button>
+        <button type="submit" class="px-4 py-2 rounded bg-indigo-700 text-white hover:bg-indigo-800 w-full sm:w-auto">Guardar</button>
       </div>
     </form>
   </div>
 </div>
 
 <!-- Modal Eliminar -->
-<div id="modalDelete" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
-  <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+<div id="modalDelete" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden px-2 py-4 overflow-y-auto">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md sm:max-w-lg md:max-w-xl p-4 sm:p-6 md:p-8 relative mx-auto overflow-y-auto" style="max-height:95vh;">
     <h3 class="text-xl font-bold mb-4 text-red-600">¿Eliminar abono?</h3>
     <form method="POST" id="deleteForm">
       <input type="hidden" name="delete_id" id="delete_id">
       <p class="mb-6">¿Estás seguro de que deseas eliminar este abono? Esta acción no se puede deshacer.</p>
-      <div class="flex justify-end gap-2">
-        <button type="button" id="closeDeleteModal" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancelar</button>
-        <button type="submit" class="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600">Eliminar</button>
+      <div class="flex flex-col sm:flex-row justify-end gap-2">
+        <button type="button" id="closeDeleteModal" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 w-full sm:w-auto">Cancelar</button>
+        <button type="submit" class="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600 w-full sm:w-auto">Eliminar</button>
       </div>
     </form>
   </div>

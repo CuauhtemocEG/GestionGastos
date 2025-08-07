@@ -34,18 +34,18 @@ $saldo = $totalPagos - $totalGastos;
     <h2 class="text-white text-3xl font-bold mb-3">Resumen</h2>
 </div>
 
-<main class="-mt-0 px-8">
-    <div class="bg-white rounded-xl shadow-lg p-8 min-h-[350px] mb-10">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-indigo-50 p-6 rounded-lg shadow">
+<main class="-mt-0 px-2 sm:px-4 md:px-8">
+    <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8 min-h-[350px] mb-10 w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+            <div class="bg-indigo-50 p-4 sm:p-6 rounded-lg shadow w-full">
                 <h3 class="text-xl font-bold text-indigo-800 mb-3">Total de Gastos</h3>
                 <p class="text-2xl font-bold text-red-600">$<?= number_format($totalGastos,2) ?></p>
             </div>
-            <div class="bg-green-50 p-6 rounded-lg shadow">
+            <div class="bg-green-50 p-4 sm:p-6 rounded-lg shadow w-full">
                 <h3 class="text-xl font-bold text-green-800 mb-3">Total de Abonos</h3>
                 <p class="text-2xl font-bold text-green-600">$<?= number_format($totalPagos,2) ?></p>
             </div>
-            <div class="bg-blue-50 p-6 rounded-lg shadow">
+            <div class="bg-blue-50 p-4 sm:p-6 rounded-lg shadow w-full">
                 <h3 class="text-xl font-bold text-blue-800 mb-3">Saldo</h3>
                 <p class="text-2xl font-bold <?= $saldo >= 0 ? 'text-green-700' : 'text-red-700' ?>">
                     $<?= number_format($saldo,2) ?>

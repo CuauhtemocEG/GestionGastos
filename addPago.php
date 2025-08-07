@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <main class="-mt-0 px-8">
-    <div class="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-8 mb-10">
+    <div class="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8 mb-10 w-full">
         <form method="POST" class="space-y-6">
             <div>
                 <label class="block font-medium text-gray-700 mb-1">Descripción</label>
@@ -67,9 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label class="block font-medium text-gray-700 mb-1">Fecha</label>
                 <input type="date" name="fecha" required value="<?= date('Y-m-d') ?>" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
             </div>
-            <div class="flex justify-between">
-                <a href="pagos.php" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-gray-800 font-semibold">Cancelar</a>
-                <button type="submit" class="px-6 py-2 bg-indigo-700 text-white rounded hover:bg-indigo-800 font-semibold">Agregar Abono</button>
+            <div class="flex flex-col sm:flex-row justify-between gap-2">
+                <a href="pagos.php" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-gray-800 font-semibold w-full sm:w-auto text-center">Cancelar</a>
+                <button type="submit" class="px-6 py-2 bg-indigo-700 text-white rounded hover:bg-indigo-800 font-semibold w-full sm:w-auto">Agregar Abono</button>
             </div>
         </form>
     </div>
