@@ -26,6 +26,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<style>
+  /* Tablas responsivas */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+</style>
 <body class="bg-gray-100 min-h-screen">
 
 
@@ -65,13 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <main class="-mt-0 px-2 sm:px-8">
-</style>
-  /* Tablas responsivas */
-  .table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-</style>
     <div class="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8 mb-10 w-full">
         <form method="POST" class="space-y-6">
             <div>
