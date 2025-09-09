@@ -1,27 +1,11 @@
 <?php
+// Archivo principal con sistema de enrutamiento
 include 'config.php';
+include 'router.php';
 
-// Obtener filtros
-$fechaInicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
-$fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');
-$tipoFiltro = $_GET['tipo'] ?? 'todos';
-$metodoFiltro = $_GET['metodo'] ?? 'todos';
-
-// Manejo de edición de gastos
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_gasto_id'])) {
-    $id = intval($_POST['edit_gasto_id']);
-    $descripcion = $_POST['edit_gasto_descripcion'];
-    $monto = floatval($_POST['edit_gasto_monto']);
-    $fecha = $_POST['edit_gasto_fecha'];
-    $metodo = $_POST['edit_gasto_metodo'];
-    $tipo = $_POST['edit_gasto_tipo'];
-    $stmt = $conexion->prepare("UPDATE Gastos SET Descripcion=?, Monto=?, Fecha=?, Metodo=?, Tipo=? WHERE ID=?");
-    $stmt->bind_param('sdsssi', $descripcion, $monto, $fecha, $metodo, $tipo, $id);
-    $stmt->execute();
-    $stmt->close();
-    header('Location: index.php?fecha_inicio=' . urlencode($fechaInicio) . '&fecha_fin=' . urlencode($fechaFin));
-    exit;
-}
+// Incluir el layout principal
+include 'includes/layout.php';
+?>
 
 // Funciones para compatibilidad con el código existente
 function obtenerGastos($conexion, $fechaInicio, $fechaFin)

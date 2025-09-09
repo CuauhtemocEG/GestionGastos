@@ -8,10 +8,10 @@ echo "<h1>Diagnóstico del Sistema</h1>";
 // Verificar conexión a la base de datos
 echo "<h2>1. Verificando conexión a la base de datos</h2>";
 try {
-    $host = 'localhost:3306';
+    $host = 'localhost';
     $usuario = 'kallijag_stage';
     $clave = 'uNtiL.horSe@5';
-    $baseDeDatos = 'kallijag_inventory_stage';
+    $baseDeDatos = 'kallijag_pos_stage'; // Base de datos correcta
     
     $conexion = new mysqli($host, $usuario, $clave, $baseDeDatos);
     
@@ -19,17 +19,33 @@ try {
         echo "❌ Error de conexión: " . $conexion->connect_error . "<br>";
     } else {
         echo "✅ Conexión a la base de datos exitosa<br>";
+        echo "Base de datos: $baseDeDatos<br>";
         
         // Verificar tablas
         echo "<h3>Verificando tablas:</h3>";
-        $tablas = ['Gastos', 'Pagos', 'Sucursales', 'usuarios'];
+        $tablas = ['Gastos', 'Pagos', 'Sucursales', 'usuarios', 'configuraciones', 'sesiones'];
         foreach ($tablas as $tabla) {
             $result = $conexion->query("SHOW TABLES LIKE '$tabla'");
             if ($result->num_rows > 0) {
                 echo "✅ Tabla '$tabla' existe<br>";
+                
+                // Contar registros
+                $count_result = $conexion->query("SELECT COUNT(*) as count FROM $tabla");
+                $count = $count_result->fetch_assoc()['count'];
+                echo "&nbsp;&nbsp;&nbsp;&nbsp;└─ Registros: $count<br>";
             } else {
                 echo "❌ Tabla '$tabla' no existe<br>";
             }
+        }
+        
+        // Verificar usuario admin
+        echo "<h3>Verificando usuario admin:</h3>";
+        $admin_result = $conexion->query("SELECT username, email FROM usuarios WHERE username = 'admin'");
+        if ($admin_result->num_rows > 0) {
+            $admin = $admin_result->fetch_assoc();
+            echo "✅ Usuario admin existe: " . $admin['username'] . " (" . $admin['email'] . ")<br>";
+        } else {
+            echo "❌ Usuario admin no existe<br>";
         }
     }
 } catch (Exception $e) {

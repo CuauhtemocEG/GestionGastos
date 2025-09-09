@@ -8,7 +8,7 @@ session_start();
 $host = 'localhost';
 $usuario = 'kallijag_stage';
 $clave = 'uNtiL.horSe@5';
-$baseDeDatos = 'kallijag_inventory_stage';
+$baseDeDatos = 'kallijag_pos_stage'; // Nombre correcto de la base de datos
 
 try {
     $conexion = new mysqli($host, $usuario, $clave, $baseDeDatos);
@@ -18,7 +18,7 @@ try {
     }
     
     // Configurar charset
-    $conexion->set_charset("utf8");
+    $conexion->set_charset("utf8mb4");
     
 } catch (Exception $e) {
     die("Error de conexión: " . $e->getMessage());
