@@ -1,8 +1,28 @@
 <?php
 // Verificar que el usuario sea admin
-if (!isset($_SESSION['user_id']) || $_SESSION['username'] !== 'admin') {
+$is_admin = false;
+if (isset($_SESSION['user_id'])) {
+    // Verificar por username o por email si es admin
+    if ((isset($_SESSION['username']) && $_SESSION['username'] === 'admin') || 
+        (isset($_SESSION['email']) && $_SESSION['email'] === 'admin@gastosapp.com')) {
+        $is_admin = true;
+    }
+}
+
+if (!$is_admin) {
     header('Location: ?page=home');
     exit;
+}
+
+// Verificar y agregar columna username si no existe
+$check_column = $conexion->query("SHOW COLUMNS FROM usuarios LIKE 'username'");
+if ($check_column->num_rows == 0) {
+    $add_column = "ALTER TABLE usuarios ADD COLUMN username VARCHAR(50) UNIQUE NULL AFTER email";
+    $conexion->query($add_column);
+    
+    // Actualizar registros existentes para tener username basado en email
+    $update_existing = "UPDATE usuarios SET username = SUBSTRING_INDEX(email, '@', 1) WHERE username IS NULL";
+    $conexion->query($update_existing);
 }
 
 $mensaje = '';
@@ -35,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 } else {
                     // Crear usuario
                     $password_hash = password_hash($password, PASSWORD_BCRYPT);
-                    $insert_sql = "INSERT INTO usuarios (nombre_completo, email, username, password_hash, activo, fecha_registro) VALUES (?, ?, ?, ?, 1, NOW())";
+                    $insert_sql = "INSERT INTO usuarios (nombre_completo, email, username, password_hash, activo) VALUES (?, ?, ?, ?, 1)";
                     $insert_stmt = $conexion->prepare($insert_sql);
                     $insert_stmt->bind_param('ssss', $nombre, $email, $username, $password_hash);
                     
