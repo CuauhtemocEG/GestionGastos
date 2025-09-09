@@ -26,8 +26,22 @@ if ($stmt) {
     $result = $stmt->get_result();
 
     if ($result->num_rows === 0) {
-        $sql = "INSERT INTO usuarios (email, password_hash, nombre_completo, rol, activo, fecha_creacion) 
-                VALUES (?, ?, ?, 'admin', 1, NOW())";
+        // Primero verificar qué campos existen en la tabla
+        $describe = $conexion->query("DESCRIBE usuarios");
+        $campos_existentes = [];
+        while ($row = $describe->fetch_assoc()) {
+            $campos_existentes[] = $row['Field'];
+        }
+        
+        // Construir la consulta INSERT según los campos disponibles
+        if (in_array('rol', $campos_existentes)) {
+            $sql = "INSERT INTO usuarios (email, password_hash, nombre_completo, rol, activo, fecha_creacion) 
+                    VALUES (?, ?, ?, 'admin', 1, NOW())";
+        } else {
+            $sql = "INSERT INTO usuarios (email, password_hash, nombre_completo, activo) 
+                    VALUES (?, ?, ?, 1)";
+        }
+        
         $stmt = $conexion->prepare($sql);
         $stmt->bind_param('sss', $email, $password, $nombre);
         
