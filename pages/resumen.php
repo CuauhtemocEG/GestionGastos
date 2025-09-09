@@ -64,16 +64,15 @@ $total_pagos = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
 $balance = $total_pagos - $total_gastos;
 ?>
 
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">
-        <i class="fas fa-chart-bar mr-2 text-blue-600"></i>
-        Resumen Financiero
-    </h1>
-    <p class="text-gray-600 mt-1">Análisis detallado de gastos e ingresos</p>
-</div>
-
 <!-- Filtros -->
 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="mb-4">
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+            <i class="fas fa-chart-bar mr-2 text-blue-600"></i>
+            Análisis Financiero
+        </h2>
+        <p class="text-sm text-gray-600">Filtra y visualiza tus gastos e ingresos</p>
+    </div>
     <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <input type="hidden" name="page" value="resumen">
         
