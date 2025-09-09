@@ -8,30 +8,97 @@ if (!isset($_SESSION['user_id']) || $_SESSION['username'] !== 'admin') {
 $mensaje = '';
 $tipo_mensaje = '';
 
-// Procesar acciones (activar/desactivar usuario)
+// Procesar acciones
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    $user_id = intval($_POST['user_id']);
     $action = $_POST['action'];
     
-    if ($action === 'toggle_status' && $user_id > 0) {
-        // No permitir desactivar al propio admin
-        if ($user_id === $_SESSION['user_id']) {
-            $mensaje = 'No puedes desactivar tu propia cuenta de administrador';
-            $tipo_mensaje = 'error';
-        } else {
-            $sql = "UPDATE usuarios SET activo = NOT activo WHERE id = ?";
-            $stmt = $conexion->prepare($sql);
-            $stmt->bind_param('i', $user_id);
+    switch ($action) {
+        case 'create_user':
+            $nombre = trim($_POST['nombre'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $username = trim($_POST['username'] ?? '');
+            $password = $_POST['password'] ?? '';
             
-            if ($stmt->execute()) {
-                $mensaje = 'Estado del usuario actualizado exitosamente';
-                $tipo_mensaje = 'success';
+            if (empty($nombre) || empty($email) || empty($username) || empty($password)) {
+                $mensaje = 'Todos los campos son obligatorios.';
+                $tipo_mensaje = 'error';
             } else {
-                $mensaje = 'Error al actualizar el usuario: ' . $conexion->error;
+                // Verificar que el email y username no existan
+                $check_sql = "SELECT id FROM usuarios WHERE email = ? OR username = ?";
+                $check_stmt = $conexion->prepare($check_sql);
+                $check_stmt->bind_param('ss', $email, $username);
+                $check_stmt->execute();
+                
+                if ($check_stmt->get_result()->num_rows > 0) {
+                    $mensaje = 'El email o username ya están en uso.';
+                    $tipo_mensaje = 'error';
+                } else {
+                    // Crear usuario
+                    $password_hash = password_hash($password, PASSWORD_BCRYPT);
+                    $insert_sql = "INSERT INTO usuarios (nombre_completo, email, username, password_hash, activo, fecha_registro) VALUES (?, ?, ?, ?, 1, NOW())";
+                    $insert_stmt = $conexion->prepare($insert_sql);
+                    $insert_stmt->bind_param('ssss', $nombre, $email, $username, $password_hash);
+                    
+                    if ($insert_stmt->execute()) {
+                        $mensaje = 'Usuario creado exitosamente.';
+                        $tipo_mensaje = 'success';
+                    } else {
+                        $mensaje = 'Error al crear el usuario: ' . $conexion->error;
+                        $tipo_mensaje = 'error';
+                    }
+                }
+                $check_stmt->close();
+            }
+            break;
+            
+        case 'toggle_status':
+            $user_id = intval($_POST['user_id']);
+            
+            if ($user_id > 0) {
+                // No permitir desactivar al propio admin
+                if ($user_id === $_SESSION['user_id']) {
+                    $mensaje = 'No puedes desactivar tu propia cuenta de administrador';
+                    $tipo_mensaje = 'error';
+                } else {
+                    $sql = "UPDATE usuarios SET activo = NOT activo WHERE id = ?";
+                    $stmt = $conexion->prepare($sql);
+                    $stmt->bind_param('i', $user_id);
+                    
+                    if ($stmt->execute()) {
+                        $mensaje = 'Estado del usuario actualizado exitosamente';
+                        $tipo_mensaje = 'success';
+                    } else {
+                        $mensaje = 'Error al actualizar el usuario: ' . $conexion->error;
+                        $tipo_mensaje = 'error';
+                    }
+                    $stmt->close();
+                }
+            }
+            break;
+            
+        case 'reset_password':
+            $user_id = intval($_POST['user_id'] ?? 0);
+            $new_password = $_POST['new_password'] ?? '';
+            
+            if ($user_id > 0 && !empty($new_password)) {
+                $password_hash = password_hash($new_password, PASSWORD_BCRYPT);
+                $update_sql = "UPDATE usuarios SET password_hash = ? WHERE id = ?";
+                $update_stmt = $conexion->prepare($update_sql);
+                $update_stmt->bind_param('si', $password_hash, $user_id);
+                
+                if ($update_stmt->execute()) {
+                    $mensaje = 'Contraseña actualizada exitosamente.';
+                    $tipo_mensaje = 'success';
+                } else {
+                    $mensaje = 'Error al actualizar la contraseña: ' . $conexion->error;
+                    $tipo_mensaje = 'error';
+                }
+                $update_stmt->close();
+            } else {
+                $mensaje = 'Datos inválidos para resetear la contraseña.';
                 $tipo_mensaje = 'error';
             }
-            $stmt->close();
-        }
+            break;
     }
 }
 
@@ -98,7 +165,13 @@ $usuarios_recientes = $result_recientes->fetch_assoc()['count'];
                     <p class="text-gray-600">Gestiona los usuarios del sistema</p>
                 </div>
             </div>
-            <div class="mt-4 lg:mt-0">
+            <div class="mt-4 lg:mt-0 flex items-center space-x-3">
+                <button onclick="toggleCreateUserModal()" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Crear Usuario
+                </button>
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
@@ -348,13 +421,18 @@ $usuarios_recientes = $result_recientes->fetch_assoc()['count'];
                             <?php if ($usuario['id'] === $_SESSION['user_id']): ?>
                                 <span class="text-gray-400 italic">Tu cuenta</span>
                             <?php else: ?>
-                                <form method="POST" class="inline" onsubmit="return confirm('¿Estás seguro de que deseas <?= $usuario['activo'] ? 'desactivar' : 'activar' ?> este usuario?')">
-                                    <input type="hidden" name="user_id" value="<?= $usuario['id'] ?>">
-                                    <input type="hidden" name="action" value="toggle_status">
-                                    <button type="submit" class="<?= $usuario['activo'] ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900' ?> font-medium transition-colors">
-                                        <?= $usuario['activo'] ? 'Desactivar' : 'Activar' ?>
+                                <div class="flex space-x-3">
+                                    <form method="POST" class="inline" onsubmit="return confirm('¿Estás seguro de que deseas <?= $usuario['activo'] ? 'desactivar' : 'activar' ?> este usuario?')">
+                                        <input type="hidden" name="user_id" value="<?= $usuario['id'] ?>">
+                                        <input type="hidden" name="action" value="toggle_status">
+                                        <button type="submit" class="<?= $usuario['activo'] ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900' ?> font-medium transition-colors">
+                                            <?= $usuario['activo'] ? 'Desactivar' : 'Activar' ?>
+                                        </button>
+                                    </form>
+                                    <button onclick="openResetPasswordModal(<?= $usuario['id'] ?>, '<?= htmlspecialchars($usuario['nombre_completo']) ?>')" class="text-blue-600 hover:text-blue-900 font-medium transition-colors">
+                                        Resetear Password
                                     </button>
-                                </form>
+                                </div>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -365,3 +443,111 @@ $usuarios_recientes = $result_recientes->fetch_assoc()['count'];
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Modal para crear usuario -->
+<div id="createUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Crear Nuevo Usuario</h3>
+            <form method="POST" class="space-y-4">
+                <input type="hidden" name="action" value="create_user">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
+                    <input type="text" name="nombre" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" name="username" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+                    <input type="password" name="password" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="toggleCreateUserModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                        Crear Usuario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para resetear contraseña -->
+<div id="resetPasswordModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Resetear Contraseña</h3>
+            <p class="text-sm text-gray-600 mb-4">Usuario: <span id="resetUserName" class="font-medium"></span></p>
+            <form method="POST" class="space-y-4">
+                <input type="hidden" name="action" value="reset_password">
+                <input type="hidden" name="user_id" id="resetUserId">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
+                    <input type="password" name="new_password" required minlength="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">Mínimo 6 caracteres</p>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeResetPasswordModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700">
+                        Resetear Contraseña
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleCreateUserModal() {
+    const modal = document.getElementById('createUserModal');
+    modal.classList.toggle('hidden');
+}
+
+function openResetPasswordModal(userId, userName) {
+    document.getElementById('resetUserId').value = userId;
+    document.getElementById('resetUserName').textContent = userName;
+    document.getElementById('resetPasswordModal').classList.remove('hidden');
+}
+
+function closeResetPasswordModal() {
+    document.getElementById('resetPasswordModal').classList.add('hidden');
+}
+
+// Cerrar modales al hacer clic fuera
+document.addEventListener('click', function(event) {
+    const createModal = document.getElementById('createUserModal');
+    const resetModal = document.getElementById('resetPasswordModal');
+    
+    if (event.target === createModal) {
+        createModal.classList.add('hidden');
+    }
+    if (event.target === resetModal) {
+        resetModal.classList.add('hidden');
+    }
+});
+
+// Cerrar modales con tecla Escape
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        document.getElementById('createUserModal').classList.add('hidden');
+        document.getElementById('resetPasswordModal').classList.add('hidden');
+    }
+});
+</script>
