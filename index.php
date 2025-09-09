@@ -1,8 +1,21 @@
 <?php
 include 'config.php';
 
+// Obtener filtros
 $fechaInicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
 $fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');
+$tipoFiltro = $_GET['tipo'] ?? 'todos';
+$metodoFiltro = $_GET['metodo'] ?? 'todos';
+
+// Usar el nuevo sistema de filtros
+$filtros = [
+    'fecha_inicio' => $fechaInicio,
+    'fecha_fin' => $fechaFin,
+    'tipo' => $tipoFiltro,
+    'metodo' => $metodoFiltro,
+    'limite' => 100,
+    'pagina' => 1
+];
 
 // Manejo de edición de gastos
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_gasto_id'])) {
@@ -20,22 +33,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_gasto_id'])) {
     exit;
 }
 
+// Obtener datos usando el nuevo sistema
+$gastosFiltrados = $gastosManager->obtenerGastosFiltrados($filtros);
+$estadisticas = $gastosManager->obtenerEstadisticas($filtros);
+
+// Funciones para compatibilidad con el código existente
 function obtenerGastos($conexion, $fechaInicio, $fechaFin)
 {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Metodo='Tarjeta'";
-    $resultado = $conexion->query($sql);
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN ? AND ? AND Metodo='Tarjeta' ORDER BY Fecha DESC";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param('ss', $fechaInicio, $fechaFin);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
 function obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin)
 {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Metodo='Efectivo'";
-    $resultado = $conexion->query($sql);
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN ? AND ? AND Metodo='Efectivo' ORDER BY Fecha DESC";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param('ss', $fechaInicio, $fechaFin);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
 function obtenerGastosTotales($conexion, $fechaInicio, $fechaFin)
 {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin'";
-    $resultado = $conexion->query($sql);
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN ? AND ? ORDER BY Fecha DESC";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param('ss', $fechaInicio, $fechaFin);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
 function calcularTotal($gastos)
@@ -46,34 +73,50 @@ function calcularTotal($gastos)
 }
 function obtenerGastosFijos($conexion, $fechaInicio, $fechaFin)
 {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Fijo'";
-    $resultado = $conexion->query($sql);
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN ? AND ? AND Tipo='Fijo' ORDER BY Fecha DESC";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param('ss', $fechaInicio, $fechaFin);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
 function obtenerGastosCentral($conexion, $fechaInicio, $fechaFin)
 {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Central'";
-    $resultado = $conexion->query($sql);
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN ? AND ? AND Tipo='Central' ORDER BY Fecha DESC";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param('ss', $fechaInicio, $fechaFin);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
 function obtenerGastosSitio($conexion, $fechaInicio, $fechaFin)
 {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Mercado'";
-    $resultado = $conexion->query($sql);
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN ? AND ? AND Tipo='Mercado' ORDER BY Fecha DESC";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param('ss', $fechaInicio, $fechaFin);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
 function obtenerGastosMantenimiento($conexion, $fechaInicio, $fechaFin)
 {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Mantenimiento'";
-    $resultado = $conexion->query($sql);
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN ? AND ? AND Tipo='Mantenimiento' ORDER BY Fecha DESC";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param('ss', $fechaInicio, $fechaFin);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
 function obtenerGastosInversiones($conexion, $fechaInicio, $fechaFin)
 {
-    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND Tipo='Inversiones'";
-    $resultado = $conexion->query($sql);
+    $sql = "SELECT * FROM Gastos WHERE Fecha BETWEEN ? AND ? AND Tipo='Inversiones' ORDER BY Fecha DESC";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param('ss', $fechaInicio, $fechaFin);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
     return $resultado->fetch_all(MYSQLI_ASSOC);
 }
+
 $gastos = obtenerGastos($conexion, $fechaInicio, $fechaFin);
 $gastosEfectivo = obtenerGastosEfectivo($conexion, $fechaInicio, $fechaFin);
 $gastosTotales = obtenerGastosTotales($conexion, $fechaInicio, $fechaFin);
@@ -137,17 +180,24 @@ $dataMetodo = [
                 </svg>
                 GastosApp
             </span>
-            <button id="nav-toggle" class="sm:hidden text-white focus:outline-none" aria-label="Abrir menú">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
+            <div class="flex items-center gap-4">
+                <span class="text-white hidden sm:block">Hola, <?= htmlspecialchars($_SESSION['nombre_completo']) ?></span>
+                <a href="?logout=1" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition text-sm">
+                    Cerrar Sesión
+                </a>
+                <button id="nav-toggle" class="sm:hidden text-white focus:outline-none" aria-label="Abrir menú">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
         </div>
         <div id="nav-menu" class="flex-col sm:flex-row sm:flex items-center gap-6 sm:gap-8 mt-4 sm:mt-0 hidden sm:flex">
             <a href="index.php" class="px-6 py-2 rounded-lg bg-white text-indigo-700 font-semibold shadow hover:bg-indigo-100 focus:bg-indigo-100 transition block sm:inline-block">Inicio</a>
+            <a href="dashboard.php" class="text-white hover:underline block py-2 sm:py-0">Dashboard Avanzado</a>
             <a href="addExpenses.php" class="text-white hover:underline block py-2 sm:py-0">Agregar Gasto</a>
             <a href="pagos.php" class="text-white hover:underline block py-2 sm:py-0">Abonos</a>
-            <a href="resumen.php" class="text-white hover:underline block py-2 sm:py-0">Resumen</a>
+            <a href="resumen-mejorado.php" class="text-white hover:underline block py-2 sm:py-0">Resumen</a>
         </div>
     </nav>
     <script>
@@ -172,18 +222,47 @@ $dataMetodo = [
 
         <!-- Filtro -->
         <form action="index.php" method="GET" class="mb-8">
-            <div class="flex flex-col md:flex-row gap-4 items-end">
-                <div class="flex-1">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                <div>
                     <label for="fecha_inicio" class="block font-medium mb-1 text-blue-800">Fecha de inicio</label>
-                    <input type="date" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-400 shadow-sm" id="fecha_inicio" name="fecha_inicio" value="<?= $fechaInicio ?>">
-                </div>
-                <div class="flex-1">
-                    <label for="fecha_fin" class="block font-medium mb-1 text-blue-800">Fecha de fin</label>
-                    <input type="date" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-400 shadow-sm" id="fecha_fin" name="fecha_fin" value="<?= $fechaFin ?>">
+                    <input type="date" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-400 shadow-sm" 
+                           id="fecha_inicio" name="fecha_inicio" value="<?= $fechaInicio ?>">
                 </div>
                 <div>
-                    <button type="submit" class="px-5 py-2 rounded bg-blue-700 text-white font-semibold hover:bg-blue-800 transition">Buscar</button>
+                    <label for="fecha_fin" class="block font-medium mb-1 text-blue-800">Fecha de fin</label>
+                    <input type="date" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-400 shadow-sm" 
+                           id="fecha_fin" name="fecha_fin" value="<?= $fechaFin ?>">
                 </div>
+                <div>
+                    <label for="tipo" class="block font-medium mb-1 text-blue-800">Tipo</label>
+                    <select name="tipo" id="tipo" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-400 shadow-sm">
+                        <option value="todos" <?= $tipoFiltro === 'todos' ? 'selected' : '' ?>>Todos</option>
+                        <option value="Fijo" <?= $tipoFiltro === 'Fijo' ? 'selected' : '' ?>>Fijo</option>
+                        <option value="Central" <?= $tipoFiltro === 'Central' ? 'selected' : '' ?>>Central</option>
+                        <option value="Mercado" <?= $tipoFiltro === 'Mercado' ? 'selected' : '' ?>>Mercado</option>
+                        <option value="Mantenimiento" <?= $tipoFiltro === 'Mantenimiento' ? 'selected' : '' ?>>Mantenimiento</option>
+                        <option value="Inversiones" <?= $tipoFiltro === 'Inversiones' ? 'selected' : '' ?>>Inversiones</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="metodo" class="block font-medium mb-1 text-blue-800">Método</label>
+                    <select name="metodo" id="metodo" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-400 shadow-sm">
+                        <option value="todos" <?= $metodoFiltro === 'todos' ? 'selected' : '' ?>>Todos</option>
+                        <option value="Tarjeta" <?= $metodoFiltro === 'Tarjeta' ? 'selected' : '' ?>>Tarjeta</option>
+                        <option value="Efectivo" <?= $metodoFiltro === 'Efectivo' ? 'selected' : '' ?>>Efectivo</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-4 mt-4">
+                <button type="submit" class="px-5 py-2 rounded bg-blue-700 text-white font-semibold hover:bg-blue-800 transition">
+                    Aplicar Filtros
+                </button>
+                <a href="index.php" class="px-5 py-2 rounded bg-gray-500 text-white font-semibold hover:bg-gray-600 transition">
+                    Limpiar
+                </a>
+                <a href="dashboard.php" class="px-5 py-2 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
+                    Ver Dashboard Avanzado
+                </a>
             </div>
         </form>
 

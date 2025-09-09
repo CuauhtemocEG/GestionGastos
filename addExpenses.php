@@ -2,21 +2,30 @@
 include 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $descripcion = $_POST['descripcion'];
-    $monto = $_POST['monto'];
+    $descripcion = trim($_POST['descripcion']);
+    $monto = floatval($_POST['monto']);
     $fecha = $_POST['fecha'];
     $method = $_POST['typeExpense'];
     $tipoGasto = $_POST['tipoGasto'];
 
-    $sql = "INSERT INTO Gastos (Descripcion, Monto, Fecha, Metodo, Tipo) VALUES ('$descripcion', '$monto', '$fecha', '$method', '$tipoGasto')";
-
-    if ($conexion->query($sql) === TRUE) {
-        header('Location: index.php');
+    // Validaciones
+    if (empty($descripcion) || $monto <= 0 || empty($fecha) || empty($method) || empty($tipoGasto)) {
+        $error = "Todos los campos son obligatorios y el monto debe ser mayor a 0";
     } else {
-        echo "Error: " . $conexion->error;
+        // Usar prepared statement para seguridad
+        $stmt = $conexion->prepare("INSERT INTO Gastos (Descripcion, Monto, Fecha, Metodo, Tipo) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param('sdsss', $descripcion, $monto, $fecha, $method, $tipoGasto);
+        
+        if ($stmt->execute()) {
+            $success = "Gasto agregado exitosamente";
+            // Limpiar formulario
+            $descripcion = $monto = $fecha = $method = $tipoGasto = '';
+        } else {
+            $error = "Error al agregar el gasto: " . $conexion->error;
+        }
+        $stmt->close();
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -45,9 +54,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </svg>
             GastosApp
         </span>
-        <button id="nav-toggle" class="sm:hidden text-white focus:outline-none" aria-label="Abrir menú">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        <div class="flex items-center gap-4">
+            <span class="text-white hidden sm:block">Hola, <?= htmlspecialchars($_SESSION['nombre_completo']) ?></span>
+            <a href="?logout=1" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition text-sm">
+                Cerrar Sesión
+            </a>
+            <button id="nav-toggle" class="sm:hidden text-white focus:outline-none" aria-label="Abrir menú">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div id="nav-menu" class="flex-col sm:flex-row sm:flex items-center gap-6 sm:gap-8 mt-4 sm:mt-0 hidden sm:flex">
+        <a href="index.php" class="text-white hover:underline block py-2 sm:py-0">Inicio</a>
+        <a href="dashboard.php" class="text-white hover:underline block py-2 sm:py-0">Dashboard Avanzado</a>
+        <a href="addExpenses.php" class="px-6 py-2 rounded-lg bg-white text-indigo-700 font-semibold shadow hover:bg-indigo-100 focus:bg-indigo-100 transition block sm:inline-block">Agregar Gasto</a>
+        <a href="pagos.php" class="text-white hover:underline block py-2 sm:py-0">Abonos</a>
+        <a href="resumen-mejorado.php" class="text-white hover:underline block py-2 sm:py-0">Resumen</a>
+    </div>
+</nav>
             </svg>
         </button>
     </div>
@@ -73,35 +99,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <main class="-mt-0 px-2 sm:px-8">
     <div class="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8 mb-10 w-full">
+        
+        <?php if (isset($success)): ?>
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                <?= htmlspecialchars($success) ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($error)): ?>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
+        
         <form method="POST" class="space-y-6">
             <div>
                 <label class="block font-medium text-gray-700 mb-1">Descripción</label>
-                <input type="text" name="descripcion" required class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
+                <input type="text" name="descripcion" required 
+                       value="<?= htmlspecialchars($descripcion ?? '') ?>"
+                       class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400" 
+                       placeholder="Ej: Gasolina, Comida, etc.">
             </div>
             <div>
                 <label class="block font-medium text-gray-700 mb-1">Monto</label>
-                <input type="number" step="0.01" name="monto" required class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
+                <input type="number" step="0.01" min="0.01" name="monto" required 
+                       value="<?= htmlspecialchars($monto ?? '') ?>"
+                       class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400" 
+                       placeholder="0.00">
             </div>
             <div>
                 <label class="block font-medium text-gray-700 mb-1">Fecha</label>
-                <input type="date" name="fecha" required value="<?= date('Y-m-d') ?>" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
+                <input type="date" name="fecha" required 
+                       value="<?= htmlspecialchars($fecha ?? date('Y-m-d')) ?>" 
+                       class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
             </div>
             <div>
                 <label class="block font-medium text-gray-700 mb-1">Método de Pago</label>
-                <select name="typeExpense" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Tarjeta">Tarjeta</option>
+                <select name="typeExpense" required class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
+                    <option value="">Selecciona un método</option>
+                    <option value="Efectivo" <?= ($method ?? '') === 'Efectivo' ? 'selected' : '' ?>>Efectivo</option>
+                    <option value="Tarjeta" <?= ($method ?? '') === 'Tarjeta' ? 'selected' : '' ?>>Tarjeta</option>
                 </select>
             </div>
             <div>
                 <label class="block font-medium text-gray-700 mb-1">Tipo de Gasto</label>
-                <select name="tipoGasto" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
-                    <option value="General">General</option>
-                    <option value="Fijo">Fijo</option>
-                    <option value="Central">Central</option>
-                    <option value="Mercado">Mercado</option>
-                    <option value="Mantenimiento">Mantenimiento</option>
-                    <option value="Inversiones">Inversiones</option>
+                <select name="tipoGasto" required class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400">
+                    <option value="">Selecciona un tipo</option>
+                    <option value="Fijo" <?= ($tipoGasto ?? '') === 'Fijo' ? 'selected' : '' ?>>Fijo</option>
+                    <option value="Central" <?= ($tipoGasto ?? '') === 'Central' ? 'selected' : '' ?>>Central</option>
+                    <option value="Mercado" <?= ($tipoGasto ?? '') === 'Mercado' ? 'selected' : '' ?>>Mercado</option>
+                    <option value="Mantenimiento" <?= ($tipoGasto ?? '') === 'Mantenimiento' ? 'selected' : '' ?>>Mantenimiento</option>
+                    <option value="Inversiones" <?= ($tipoGasto ?? '') === 'Inversiones' ? 'selected' : '' ?>>Inversiones</option>
                 </select>
             </div>
             <div class="flex flex-col sm:flex-row justify-between gap-2">

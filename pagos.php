@@ -1,19 +1,39 @@
 <?php
 include 'config.php';
-$pagos = $conexion->query("SELECT * FROM Pagos ORDER BY fecha DESC")->fetch_all(MYSQLI_ASSOC);
+
+// Obtener filtros
+$fechaInicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
+$fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');
+$metodoFiltro = $_GET['metodo'] ?? 'todos';
+
+// Aplicar filtros
+$filtros = [
+    'fecha_inicio' => $fechaInicio,
+    'fecha_fin' => $fechaFin,
+    'metodo' => $metodoFiltro,
+    'limite' => 100,
+    'pagina' => 1
+];
+
+$pagos = $gastosManager->obtenerPagosFiltrados($filtros);
+
 // Manejo de edición
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['edit_id'])) {
         $id = intval($_POST['edit_id']);
-        $descripcion = $_POST['edit_descripcion'];
+        $descripcion = trim($_POST['edit_descripcion']);
         $monto = floatval($_POST['edit_monto']);
         $metodo = $_POST['edit_metodo'];
         $fecha = $_POST['edit_fecha'];
-        $stmt = $conexion->prepare("UPDATE Pagos SET descripcion=?, monto=?, Metodo=?, fecha=? WHERE id= ?");
+        
+        $stmt = $conexion->prepare("UPDATE Pagos SET descripcion=?, monto=?, Metodo=?, fecha=? WHERE id=?");
         $stmt->bind_param('sdssi', $descripcion, $monto, $metodo, $fecha, $id);
         $stmt->execute();
         $stmt->close();
-        header('Location: pagos.php');
+        
+        // Mantener filtros en la redirección
+        $queryString = http_build_query($filtros);
+        header('Location: pagos.php?' . $queryString);
         exit;
     }
     // Manejo de eliminación
@@ -23,9 +43,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $stmt->close();
-        header('Location: pagos.php');
+        
+        // Mantener filtros en la redirección
+        $queryString = http_build_query($filtros);
+        header('Location: pagos.php?' . $queryString);
         exit;
     }
+}
+
+// Calcular total de pagos filtrados
+$totalPagos = 0;
+foreach ($pagos as $pago) {
+    $totalPagos += $pago['monto'];
 }
 ?>
 <!DOCTYPE html>
@@ -57,18 +86,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </svg>
                 GastosApp
             </span>
-            <button id="nav-toggle" class="sm:hidden text-white focus:outline-none" aria-label="Abrir menú">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
+            <div class="flex items-center gap-4">
+                <span class="text-white hidden sm:block">Hola, <?= htmlspecialchars($_SESSION['nombre_completo']) ?></span>
+                <a href="?logout=1" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition text-sm">
+                    Cerrar Sesión
+                </a>
+                <button id="nav-toggle" class="sm:hidden text-white focus:outline-none" aria-label="Abrir menú">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
         </div>
         <div id="nav-menu" class="flex-col sm:flex-row sm:flex items-center gap-6 sm:gap-8 mt-4 sm:mt-0 hidden sm:flex">
             <a href="index.php" class="text-white hover:underline block py-2 sm:py-0">Inicio</a>
+            <a href="dashboard.php" class="text-white hover:underline block py-2 sm:py-0">Dashboard Avanzado</a>
             <a href="addExpenses.php" class="text-white hover:underline block py-2 sm:py-0">Agregar Gasto</a>
             <a href="pagos.php" class="px-6 py-2 rounded-lg bg-white text-indigo-700 font-semibold shadow hover:bg-indigo-100 focus:bg-indigo-100 transition block sm:inline-block">Abonos</a>
-            <a href="resumen.php" class="text-white hover:underline block py-2 sm:py-0">Resumen</a>
+            <a href="resumen-mejorado.php" class="text-white hover:underline block py-2 sm:py-0">Resumen</a>
         </div>
+    </nav>
     </nav>
     <script>
         // Navbar hamburguesa
@@ -83,7 +120,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <main class="-mt-0 px-8">
-        <div class="bg-white rounded-xl shadow-lg p-20 min-h-[350px] mb-10">
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <!-- Filtros -->
+            <form method="GET" class="mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label for="fecha_inicio" class="block font-medium mb-1 text-indigo-800">Fecha de inicio</label>
+                        <input type="date" class="w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-400 shadow-sm" 
+                               id="fecha_inicio" name="fecha_inicio" value="<?= $fechaInicio ?>">
+                    </div>
+                    <div>
+                        <label for="fecha_fin" class="block font-medium mb-1 text-indigo-800">Fecha de fin</label>
+                        <input type="date" class="w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-400 shadow-sm" 
+                               id="fecha_fin" name="fecha_fin" value="<?= $fechaFin ?>">
+                    </div>
+                    <div>
+                        <label for="metodo" class="block font-medium mb-1 text-indigo-800">Método</label>
+                        <select name="metodo" id="metodo" class="w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-400 shadow-sm">
+                            <option value="todos" <?= $metodoFiltro === 'todos' ? 'selected' : '' ?>>Todos</option>
+                            <option value="Tarjeta" <?= $metodoFiltro === 'Tarjeta' ? 'selected' : '' ?>>Tarjeta</option>
+                            <option value="Efectivo" <?= $metodoFiltro === 'Efectivo' ? 'selected' : '' ?>>Efectivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-4">
+                    <button type="submit" class="px-5 py-2 rounded bg-indigo-700 text-white font-semibold hover:bg-indigo-800 transition">
+                        Aplicar Filtros
+                    </button>
+                    <a href="pagos.php" class="px-5 py-2 rounded bg-gray-500 text-white font-semibold hover:bg-gray-600 transition">
+                        Limpiar
+                    </a>
+                    <a href="exportar.php?<?= http_build_query(array_merge($filtros, ['tipo_export' => 'pagos'])) ?>" 
+                       class="px-5 py-2 rounded bg-green-600 text-white font-semibold hover:bg-green-700 transition">
+                        Exportar Excel
+                    </a>
+                </div>
+            </form>
+            
+            <!-- Estadísticas -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-indigo-50 rounded-lg">
+                <div class="text-center">
+                    <h4 class="text-lg font-semibold text-indigo-700">Total Pagos</h4>
+                    <p class="text-2xl font-bold text-indigo-600">$<?= number_format($totalPagos, 2) ?></p>
+                </div>
+                <div class="text-center">
+                    <h4 class="text-lg font-semibold text-indigo-700">Cantidad</h4>
+                    <p class="text-2xl font-bold text-indigo-600"><?= count($pagos) ?></p>
+                </div>
+                <div class="text-center">
+                    <h4 class="text-lg font-semibold text-indigo-700">Promedio</h4>
+                    <p class="text-2xl font-bold text-indigo-600">
+                        $<?= count($pagos) > 0 ? number_format($totalPagos / count($pagos), 2) : '0.00' ?>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-6 min-h-[350px] mb-10">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-semibold text-indigo-700">Lista de Abonos</h3>
                 <a href="addPago.php" class="bg-indigo-700 px-5 py-2 rounded text-white hover:bg-indigo-800 transition font-semibold">Agregar Abono</a>
