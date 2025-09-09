@@ -4,13 +4,10 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Cerrar sesión en la base de datos si existe
-if (isset($_SESSION['session_id'])) {
-    include '../config.php';
-    $sql = "UPDATE sesiones SET fecha_fin = NOW() WHERE id = ?";
-    $stmt = $conexion->prepare($sql);
-    $stmt->bind_param('i', $_SESSION['session_id']);
-    $stmt->execute();
+// Registrar logout en logs si es necesario (opcional)
+if (isset($_SESSION['user_id'])) {
+    // Aquí podrías agregar logging si lo necesitas
+    // Por ahora solo limpiamos la sesión
 }
 
 // Limpiar todas las variables de sesión

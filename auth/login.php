@@ -30,22 +30,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $result = $stmt->get_result();
         
         if ($user = $result->fetch_assoc()) {
+            // Verificar contraseña - primero con hash, luego texto plano para migración
+            $password_valid = false;
+            
             if (password_verify($password, $user['password_hash'])) {
+                // Contraseña con hash válida
+                $password_valid = true;
+            } elseif ($user['password_hash'] === $password) {
+                // Contraseña en texto plano (para migración)
+                $password_valid = true;
+                
+                // Actualizar a hash automáticamente
+                $nuevo_hash = password_hash($password, PASSWORD_BCRYPT);
+                $sql_update = "UPDATE usuarios SET password_hash = ? WHERE id = ?";
+                $stmt_update = $conexion->prepare($sql_update);
+                $stmt_update->bind_param('si', $nuevo_hash, $user['id']);
+                $stmt_update->execute();
+            }
+            
+            if ($password_valid) {
                 // Login exitoso
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['email'] = $user['email'];
                 $_SESSION['nombre_completo'] = $user['nombre_completo'];
                 $_SESSION['rol'] = 'admin'; // Valor por defecto
                 $_SESSION['login_time'] = time();
+                $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
                 
-                // Registrar sesión en la tabla
-                $sql = "INSERT INTO sesiones (usuario_id, ip_address, user_agent, fecha_inicio) VALUES (?, ?, ?, NOW())";
+                // Actualizar último login en la tabla usuarios
+                $sql = "UPDATE usuarios SET ultimo_login = NOW() WHERE id = ?";
                 $stmt = $conexion->prepare($sql);
-                $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-                $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
-                $stmt->bind_param('iss', $user['id'], $ip, $user_agent);
+                $stmt->bind_param('i', $user['id']);
                 $stmt->execute();
-                $_SESSION['session_id'] = $conexion->insert_id;
                 
                 header('Location: ../index.php');
                 exit();
