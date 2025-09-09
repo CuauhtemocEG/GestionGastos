@@ -1,5 +1,9 @@
 <?php
-session_start();
+// Iniciar sesión solo si no existe una activa
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 include '../config.php';
 
 // Si ya está logueado, redirigir al dashboard
@@ -12,9 +16,9 @@ $error = '';
 $success = '';
 
 // Procesar login
-if ($_POST['action'] === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'login') {
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
     
     if (empty($email) || empty($password)) {
         $error = 'Por favor, completa todos los campos.';
@@ -37,8 +41,8 @@ if ($_POST['action'] === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Registrar sesión en la tabla
                 $sql = "INSERT INTO sesiones (usuario_id, ip_address, user_agent, fecha_inicio) VALUES (?, ?, ?, NOW())";
                 $stmt = $conexion->prepare($sql);
-                $ip = $_SERVER['REMOTE_ADDR'];
-                $user_agent = $_SERVER['HTTP_USER_AGENT'];
+                $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+                $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
                 $stmt->bind_param('iss', $user['id'], $ip, $user_agent);
                 $stmt->execute();
                 $_SESSION['session_id'] = $conexion->insert_id;
@@ -55,8 +59,8 @@ if ($_POST['action'] === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Procesar recuperación de contraseña
-if ($_POST['action'] === 'recovery' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['recovery_email']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'recovery') {
+    $email = trim($_POST['recovery_email'] ?? '');
     
     if (empty($email)) {
         $error = 'Por favor, ingresa tu email.';
@@ -116,14 +120,21 @@ if ($_POST['action'] === 'recovery' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Mensajes -->
         <?php if ($error): ?>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <?= htmlspecialchars($error) ?>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+                <strong>Error:</strong> <?= htmlspecialchars($error) ?>
             </div>
         <?php endif; ?>
 
         <?php if ($success): ?>
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                <?= $success ?>
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
+                <strong>Éxito:</strong> <?= $success ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Mensajes de timeout -->
+        <?php if (isset($_GET['timeout'])): ?>
+            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4" role="alert">
+                <strong>Sesión expirada:</strong> Tu sesión ha expirado por inactividad. Por favor, inicia sesión nuevamente.
             </div>
         <?php endif; ?>
 

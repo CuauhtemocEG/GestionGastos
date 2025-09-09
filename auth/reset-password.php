@@ -1,5 +1,9 @@
 <?php
-session_start();
+// Iniciar sesión solo si no existe una activa
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 include '../config.php';
 
 $error = '';
@@ -21,8 +25,8 @@ if (isset($_GET['token'])) {
     if ($recovery = $result->fetch_assoc()) {
         // Token válido
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $new_password = $_POST['new_password'];
-            $confirm_password = $_POST['confirm_password'];
+            $new_password = $_POST['new_password'] ?? '';
+            $confirm_password = $_POST['confirm_password'] ?? '';
             
             if (empty($new_password) || empty($confirm_password)) {
                 $error = 'Por favor, completa todos los campos.';

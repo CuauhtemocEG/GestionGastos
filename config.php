@@ -3,7 +3,10 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-session_start();
+// Iniciar sesión solo si no está activa
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 $host = 'localhost';
 $usuario = 'kallijag_stage';

@@ -1,5 +1,8 @@
 <?php
-session_start();
+// Iniciar sesión solo si no existe una activa
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Cerrar sesión en la base de datos si existe
 if (isset($_SESSION['session_id'])) {

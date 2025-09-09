@@ -1,35 +1,48 @@
 <?php
 // Script de inicialización del sistema
+// Desactivar verificación de autenticación para este script
+$_SESSION['skip_auth'] = true;
+
 include 'config.php';
 
 echo "<h2>🚀 Inicializando Sistema de Gastos Profesional</h2>\n";
 
-// 1. Crear usuario demo si no existe
+// 1. Verificar conexión a la base de datos
+if ($conexion->connect_error) {
+    die("❌ Error de conexión a la base de datos: " . $conexion->connect_error);
+}
+echo "✅ Conexión a la base de datos exitosa<br>";
+
+// 2. Crear usuario demo si no existe
 $email = 'admin@gastosapp.com';
 $password = password_hash('admin123', PASSWORD_DEFAULT);
 $nombre = 'Administrador Demo';
 
 $sql = "SELECT id FROM usuarios WHERE email = ?";
 $stmt = $conexion->prepare($sql);
-$stmt->bind_param('s', $email);
-$stmt->execute();
-$result = $stmt->get_result();
+if ($stmt) {
+    $stmt->bind_param('s', $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-if ($result->num_rows === 0) {
-    $sql = "INSERT INTO usuarios (email, password, nombre_completo, rol, activo, fecha_creacion) 
-            VALUES (?, ?, ?, 'admin', 1, NOW())";
-    $stmt = $conexion->prepare($sql);
-    $stmt->bind_param('sss', $email, $password, $nombre);
-    
-    if ($stmt->execute()) {
-        echo "✅ Usuario administrador creado exitosamente<br>";
-        echo "📧 Email: admin@gastosapp.com<br>";
-        echo "🔑 Contraseña: admin123<br><br>";
+    if ($result->num_rows === 0) {
+        $sql = "INSERT INTO usuarios (email, password, nombre_completo, rol, activo, fecha_creacion) 
+                VALUES (?, ?, ?, 'admin', 1, NOW())";
+        $stmt = $conexion->prepare($sql);
+        $stmt->bind_param('sss', $email, $password, $nombre);
+        
+        if ($stmt->execute()) {
+            echo "✅ Usuario administrador creado exitosamente<br>";
+            echo "📧 Email: admin@gastosapp.com<br>";
+            echo "🔑 Contraseña: admin123<br><br>";
+        } else {
+            echo "❌ Error creando usuario: " . $conexion->error . "<br><br>";
+        }
     } else {
-        echo "❌ Error creando usuario: " . $conexion->error . "<br><br>";
+        echo "✅ Usuario administrador ya existe<br><br>";
     }
 } else {
-    echo "✅ Usuario administrador ya existe<br><br>";
+    echo "❌ Error preparando consulta de usuario<br><br>";
 }
 
 // 2. Verificar tablas necesarias
