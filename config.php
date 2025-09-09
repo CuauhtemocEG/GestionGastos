@@ -9,10 +9,10 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 $host = 'localhost';
-$usuario = 'root';
-$clave = 'root';
-$puerto = 8889;
-$baseDeDatos = 'GastosApp';
+$usuario = 'kallijag_stage';
+$clave = 'uNtiL.horSe@5';
+$puerto = 3306;
+$baseDeDatos = 'kallijag_pos_stage';
 try {
     $conexion = new mysqli($host, $usuario, $clave, $baseDeDatos, $puerto);
     
