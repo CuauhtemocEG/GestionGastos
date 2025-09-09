@@ -1,3 +1,13 @@
+<?php
+// Variables globales necesarias para compatibilidad
+global $conexion;
+
+// Definir variables de filtros por defecto si no existen
+if (!isset($fechaInicio)) $fechaInicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
+if (!isset($fechaFin)) $fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');
+if (!isset($tipoFiltro)) $tipoFiltro = $_GET['tipo'] ?? 'todos';
+if (!isset($metodoFiltro)) $metodoFiltro = $_GET['metodo'] ?? 'todos';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>

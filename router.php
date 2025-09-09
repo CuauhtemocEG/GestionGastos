@@ -30,6 +30,7 @@ class Router {
     }
     
     public function renderPage() {
+        global $conexion; // Hacer la conexión disponible
         $path = $this->getCurrentPath();
         
         if (isset($this->routes[$path])) {
