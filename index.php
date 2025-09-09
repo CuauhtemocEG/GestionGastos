@@ -7,16 +7,6 @@ $fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');
 $tipoFiltro = $_GET['tipo'] ?? 'todos';
 $metodoFiltro = $_GET['metodo'] ?? 'todos';
 
-// Usar el nuevo sistema de filtros
-$filtros = [
-    'fecha_inicio' => $fechaInicio,
-    'fecha_fin' => $fechaFin,
-    'tipo' => $tipoFiltro,
-    'metodo' => $metodoFiltro,
-    'limite' => 100,
-    'pagina' => 1
-];
-
 // Manejo de edición de gastos
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_gasto_id'])) {
     $id = intval($_POST['edit_gasto_id']);
@@ -32,10 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_gasto_id'])) {
     header('Location: index.php?fecha_inicio=' . urlencode($fechaInicio) . '&fecha_fin=' . urlencode($fechaFin));
     exit;
 }
-
-// Obtener datos usando el nuevo sistema
-$gastosFiltrados = $gastosManager->obtenerGastosFiltrados($filtros);
-$estadisticas = $gastosManager->obtenerEstadisticas($filtros);
 
 // Funciones para compatibilidad con el código existente
 function obtenerGastos($conexion, $fechaInicio, $fechaFin)
