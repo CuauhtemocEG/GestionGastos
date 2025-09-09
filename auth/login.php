@@ -23,14 +23,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (empty($email) || empty($password)) {
         $error = 'Por favor, completa todos los campos.';
     } else {
-        $sql = "SELECT id, email, password, nombre_completo, rol, activo FROM usuarios WHERE email = ? AND activo = 1";
+        $sql = "SELECT id, email, password_hash, nombre_completo, rol, activo FROM usuarios WHERE email = ? AND activo = 1";
         $stmt = $conexion->prepare($sql);
         $stmt->bind_param('s', $email);
         $stmt->execute();
         $result = $stmt->get_result();
         
         if ($user = $result->fetch_assoc()) {
-            if (password_verify($password, $user['password'])) {
+            if (password_verify($password, $user['password_hash'])) {
                 // Login exitoso
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['email'] = $user['email'];

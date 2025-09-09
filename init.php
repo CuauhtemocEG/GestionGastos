@@ -26,7 +26,7 @@ if ($stmt) {
     $result = $stmt->get_result();
 
     if ($result->num_rows === 0) {
-        $sql = "INSERT INTO usuarios (email, password, nombre_completo, rol, activo, fecha_creacion) 
+        $sql = "INSERT INTO usuarios (email, password_hash, nombre_completo, rol, activo, fecha_creacion) 
                 VALUES (?, ?, ?, 'admin', 1, NOW())";
         $stmt = $conexion->prepare($sql);
         $stmt->bind_param('sss', $email, $password, $nombre);
@@ -51,7 +51,7 @@ $tablas_requeridas = [
         CREATE TABLE IF NOT EXISTS usuarios (
             id INT AUTO_INCREMENT PRIMARY KEY,
             email VARCHAR(255) UNIQUE NOT NULL,
-            password VARCHAR(255) NOT NULL,
+            password_hash VARCHAR(255) NOT NULL,
             nombre_completo VARCHAR(255) NOT NULL,
             rol ENUM('admin', 'usuario') DEFAULT 'usuario',
             activo TINYINT(1) DEFAULT 1,

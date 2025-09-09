@@ -38,7 +38,7 @@ if (isset($_GET['token'])) {
                 // Actualizar contraseña
                 $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
                 
-                $sql = "UPDATE usuarios SET password = ? WHERE id = ?";
+                $sql = "UPDATE usuarios SET password_hash = ? WHERE id = ?";
                 $stmt = $conexion->prepare($sql);
                 $stmt->bind_param('si', $hashed_password, $recovery['usuario_id']);
                 $stmt->execute();
