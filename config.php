@@ -23,4 +23,38 @@ try {
 } catch (Exception $e) {
     die("Error de conexión: " . $e->getMessage());
 }
+
+// Función para verificar autenticación
+function verificarAutenticacion() {
+    // Excluir páginas de auth del chequeo
+    $current_file = basename($_SERVER['PHP_SELF']);
+    $auth_pages = ['login.php', 'reset-password.php', 'logout.php'];
+    
+    if (in_array($current_file, $auth_pages)) {
+        return true;
+    }
+    
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: auth/login.php');
+        exit();
+    }
+    
+    // Verificar timeout de sesión (24 horas)
+    if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time']) > 86400) {
+        session_destroy();
+        header('Location: auth/login.php?timeout=1');
+        exit();
+    }
+    
+    return true;
+}
+
+// Verificar autenticación automáticamente
+verificarAutenticacion();
+
+// Procesar logout
+if (isset($_GET['logout'])) {
+    header('Location: auth/logout.php');
+    exit();
+}
 ?>
