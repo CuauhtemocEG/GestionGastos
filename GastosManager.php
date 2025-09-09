@@ -1,10 +1,4 @@
 <?php
-include 'config.php';
-include 'auth.php';
-
-// Verificar que el usuario esté autenticado
-$auth->requireLogin();
-
 class GastosManager {
     private $conexion;
     

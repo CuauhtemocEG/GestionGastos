@@ -1,0 +1,111 @@
+/* Corrección para Chart.js - Evitar expansión infinita de gráficos */
+
+/* Contenedores de gráficos con altura fija */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.chart-container-large {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
+
+.chart-container-small {
+    position: relative;
+    height: 200px;
+    width: 100%;
+}
+
+/* Asegurar que los canvas no se expandan */
+canvas {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Contenedores específicos para gráficos de dashboard */
+.dashboard-chart {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+}
+
+.dashboard-chart canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Para gráficos en grids responsivos */
+.grid-chart-container {
+    position: relative;
+    height: 300px;
+    min-height: 300px;
+    max-height: 300px;
+    overflow: hidden;
+}
+
+/* Media queries para responsive */
+@media (max-width: 768px) {
+    .chart-container,
+    .chart-container-large,
+    .dashboard-chart,
+    .grid-chart-container {
+        height: 250px;
+        min-height: 250px;
+        max-height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-container,
+    .chart-container-large,
+    .dashboard-chart,
+    .grid-chart-container {
+        height: 200px;
+        min-height: 200px;
+        max-height: 200px;
+    }
+}
+
+/* Evitar scroll horizontal en gráficos */
+.chart-wrapper {
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+/* Estilos para las leyendas de Chart.js */
+.chartjs-legend {
+    margin-top: 10px;
+}
+
+.chartjs-legend ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.chartjs-legend li {
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 5px;
+}
+
+/* Tooltips de Chart.js */
+.chartjs-tooltip {
+    opacity: 1;
+    position: absolute;
+    background: rgba(0, 0, 0, .8);
+    color: white;
+    border-radius: 3px;
+    -webkit-transition: all .1s ease;
+    transition: all .1s ease;
+    pointer-events: none;
+    -webkit-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+}

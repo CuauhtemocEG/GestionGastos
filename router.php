@@ -31,6 +31,14 @@ class Router {
     
     public function renderPage() {
         global $conexion; // Hacer la conexión disponible
+        
+        // Incluir GastosManager para todas las páginas
+        include_once 'GastosManager.php';
+        
+        // Crear instancia global del manager
+        global $manager;
+        $manager = new GastosManager($conexion);
+        
         $path = $this->getCurrentPath();
         
         if (isset($this->routes[$path])) {
@@ -60,11 +68,13 @@ class Router {
 // Configurar rutas
 $router = new Router();
 $router->addRoute('home', 'pages/home.php', 'Inicio - Gastos');
-$router->addRoute('gastos', 'pages/gastos.php', 'Gestión de Gastos');
-$router->addRoute('pagos', 'pages/pagos.php', 'Gestión de Pagos');
+$router->addRoute('gastos', 'dashboard-gastos.php', 'Dashboard de Gastos');
+$router->addRoute('pagos', 'dashboard-pagos.php', 'Dashboard de Pagos');
 $router->addRoute('resumen', 'pages/resumen.php', 'Resumen Financiero');
 $router->addRoute('add-gasto', 'pages/add-gasto.php', 'Agregar Gasto');
 $router->addRoute('add-pago', 'pages/add-pago.php', 'Agregar Pago');
 $router->addRoute('dashboard', 'pages/dashboard.php', 'Dashboard Avanzado');
+$router->addRoute('analytics', 'pages/analytics.php', 'Analytics Inteligente');
 $router->addRoute('configuracion', 'pages/configuracion.php', 'Configuración');
+
 ?>

@@ -94,11 +94,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         required>
                     <option value="">Seleccione un método...</option>
+                    <option value="Efectivo" <?php echo (isset($metodo) && $metodo === 'Efectivo') ? 'selected' : ''; ?>>
+                        Efectivo
+                    </option>
                     <option value="Tarjeta" <?php echo (isset($metodo) && $metodo === 'Tarjeta') ? 'selected' : ''; ?>>
                         Tarjeta
                     </option>
-                    <option value="Efectivo" <?php echo (isset($metodo) && $metodo === 'Efectivo') ? 'selected' : ''; ?>>
-                        Efectivo
+                    <option value="Transferencia" <?php echo (isset($metodo) && $metodo === 'Transferencia') ? 'selected' : ''; ?>>
+                        Transferencia
                     </option>
                 </select>
             </div>

@@ -1,89 +1,98 @@
-<?php
-// Archivo de diagnóstico para verificar errores
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-echo "<h1>Diagnóstico del Sistema</h1>";
-
-// Verificar conexión a la base de datos
-echo "<h2>1. Verificando conexión a la base de datos</h2>";
-try {
-    $host = 'localhost';
-    $usuario = 'kallijag_stage';
-    $clave = 'uNtiL.horSe@5';
-    $baseDeDatos = 'kallijag_pos_stage'; // Base de datos correcta
-    
-    $conexion = new mysqli($host, $usuario, $clave, $baseDeDatos);
-    
-    if ($conexion->connect_error) {
-        echo "❌ Error de conexión: " . $conexion->connect_error . "<br>";
-    } else {
-        echo "✅ Conexión a la base de datos exitosa<br>";
-        echo "Base de datos: $baseDeDatos<br>";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico del Sistema</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">🔧 Diagnóstico del Sistema</h1>
         
-        // Verificar tablas
-        echo "<h3>Verificando tablas:</h3>";
-        $tablas = ['Gastos', 'Pagos', 'Sucursales', 'usuarios', 'configuraciones', 'sesiones'];
-        foreach ($tablas as $tabla) {
-            $result = $conexion->query("SHOW TABLES LIKE '$tabla'");
-            if ($result->num_rows > 0) {
-                echo "✅ Tabla '$tabla' existe<br>";
+        <?php
+        // Configuraciones posibles de MAMP
+        $configuraciones = [
+            ['host' => 'localhost', 'puerto' => 3306, 'usuario' => 'root', 'clave' => 'root'],
+            ['host' => 'localhost', 'puerto' => 8889, 'usuario' => 'root', 'clave' => 'root'],
+            ['host' => '127.0.0.1', 'puerto' => 3306, 'usuario' => 'root', 'clave' => 'root'],
+            ['host' => '127.0.0.1', 'puerto' => 8889, 'usuario' => 'root', 'clave' => 'root'],
+        ];
+        
+        echo '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
+        
+        foreach ($configuraciones as $i => $config) {
+            echo '<div class="bg-white rounded-lg shadow-md p-6">';
+            echo '<h3 class="text-lg font-semibold mb-4">Configuración ' . ($i + 1) . '</h3>';
+            echo '<p class="text-sm text-gray-600 mb-2">Host: ' . $config['host'] . ':' . $config['puerto'] . '</p>';
+            
+            try {
+                $conexion = new mysqli($config['host'], $config['usuario'], $config['clave'], '', $config['puerto']);
                 
-                // Contar registros
-                $count_result = $conexion->query("SELECT COUNT(*) as count FROM $tabla");
-                $count = $count_result->fetch_assoc()['count'];
-                echo "&nbsp;&nbsp;&nbsp;&nbsp;└─ Registros: $count<br>";
-            } else {
-                echo "❌ Tabla '$tabla' no existe<br>";
+                if ($conexion->connect_error) {
+                    echo '<div class="bg-red-100 text-red-700 p-3 rounded">';
+                    echo '❌ Error: ' . $conexion->connect_error;
+                    echo '</div>';
+                } else {
+                    echo '<div class="bg-green-100 text-green-700 p-3 rounded">';
+                    echo '✅ Conexión exitosa!';
+                    echo '</div>';
+                    
+                    // Verificar si existe la base de datos
+                    $result = $conexion->query("SHOW DATABASES LIKE 'GastosApp'");
+                    if ($result && $result->num_rows > 0) {
+                        echo '<p class="mt-2 text-green-600">✅ Base de datos GastosApp existe</p>';
+                        
+                        // Usar esta configuración para crear config.php correcto
+                        echo '<div class="mt-4 p-3 bg-blue-50 rounded">';
+                        echo '<p class="font-semibold text-blue-800">Configuración recomendada para config.php:</p>';
+                        echo '<pre class="text-xs mt-2 text-blue-700">';
+                        echo "\$host = '{$config['host']}';\n";
+                        echo "\$usuario = '{$config['usuario']}';\n";
+                        echo "\$clave = '{$config['clave']}';\n";
+                        echo "\$puerto = {$config['puerto']};\n";
+                        echo "\$baseDeDatos = 'GastosApp';";
+                        echo '</pre>';
+                        echo '</div>';
+                    } else {
+                        echo '<p class="mt-2 text-yellow-600">⚠️ Base de datos GastosApp no existe</p>';
+                        echo '<button onclick="crearBaseDatos(' . $i . ')" class="mt-2 bg-blue-600 text-white px-3 py-1 rounded text-sm">Crear Base de Datos</button>';
+                    }
+                }
+            } catch (Exception $e) {
+                echo '<div class="bg-red-100 text-red-700 p-3 rounded">';
+                echo '❌ Error: ' . $e->getMessage();
+                echo '</div>';
             }
+            
+            echo '</div>';
         }
         
-        // Verificar usuario admin
-        echo "<h3>Verificando usuario admin:</h3>";
-        $admin_result = $conexion->query("SELECT username, email FROM usuarios WHERE username = 'admin'");
-        if ($admin_result->num_rows > 0) {
-            $admin = $admin_result->fetch_assoc();
-            echo "✅ Usuario admin existe: " . $admin['username'] . " (" . $admin['email'] . ")<br>";
-        } else {
-            echo "❌ Usuario admin no existe<br>";
-        }
+        echo '</div>';
+        ?>
+        
+        <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold mb-4">📋 Instrucciones</h3>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                <li>Asegúrate de que MAMP esté ejecutándose</li>
+                <li>Encuentra la configuración que muestre "✅ Conexión exitosa"</li>
+                <li>Si la base de datos no existe, haz clic en "Crear Base de Datos"</li>
+                <li>Actualiza el archivo config.php con la configuración recomendada</li>
+                <li>Prueba las páginas de nuevo</li>
+            </ol>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <a href="index.php" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                Volver al Sistema
+            </a>
+        </div>
+    </div>
+    
+    <script>
+    function crearBaseDatos(configIndex) {
+        alert('Para crear la base de datos, ejecuta este comando en phpMyAdmin:\nCREATE DATABASE GastosApp;');
     }
-} catch (Exception $e) {
-    echo "❌ Error al conectar: " . $e->getMessage() . "<br>";
-}
-
-// Verificar archivos PHP
-echo "<h2>2. Verificando archivos PHP</h2>";
-$archivos = ['config.php', 'auth.php', 'GastosManager.php', 'index.php', 'pagos.php', 'resumen.php'];
-foreach ($archivos as $archivo) {
-    if (file_exists($archivo)) {
-        echo "✅ Archivo '$archivo' existe<br>";
-    } else {
-        echo "❌ Archivo '$archivo' no existe<br>";
-    }
-}
-
-// Verificar permisos
-echo "<h2>3. Verificando permisos</h2>";
-echo "Directorio actual: " . getcwd() . "<br>";
-echo "Permisos del directorio: " . substr(sprintf('%o', fileperms('.')), -4) . "<br>";
-
-// Verificar versión de PHP
-echo "<h2>4. Información de PHP</h2>";
-echo "Versión de PHP: " . phpversion() . "<br>";
-echo "Extensiones cargadas: " . implode(', ', get_loaded_extensions()) . "<br>";
-
-// Verificar si mysqli está disponible
-if (extension_loaded('mysqli')) {
-    echo "✅ Extensión mysqli está disponible<br>";
-} else {
-    echo "❌ Extensión mysqli NO está disponible<br>";
-}
-
-echo "<h2>5. Variables de servidor</h2>";
-echo "HTTP_HOST: " . ($_SERVER['HTTP_HOST'] ?? 'No definido') . "<br>";
-echo "SERVER_NAME: " . ($_SERVER['SERVER_NAME'] ?? 'No definido') . "<br>";
-echo "DOCUMENT_ROOT: " . ($_SERVER['DOCUMENT_ROOT'] ?? 'No definido') . "<br>";
-
-echo "<h2>Diagnóstico completado</h2>";
-?>
+    </script>
+</body>
+</html>

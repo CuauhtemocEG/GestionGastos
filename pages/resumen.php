@@ -1,4 +1,7 @@
 <?php
+// Usar el GastosManager global
+global $manager;
+
 // Obtener filtros
 $fechaInicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
 $fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');
@@ -208,9 +211,22 @@ $balance = $total_pagos - $total_gastos;
                     <?php foreach ($gastos_por_metodo as $gasto): ?>
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                    <?php echo $gasto['Metodo'] === 'Tarjeta' ? 'bg-indigo-100 text-indigo-800' : 'bg-green-100 text-green-800'; ?>">
-                                    <i class="fas <?php echo $gasto['Metodo'] === 'Tarjeta' ? 'fa-credit-card' : 'fa-money-bill'; ?> mr-1"></i>
+                                <?php 
+                                $metodo_clases = [
+                                    'Tarjeta' => 'bg-indigo-100 text-indigo-800',
+                                    'Efectivo' => 'bg-green-100 text-green-800',
+                                    'Transferencia' => 'bg-blue-100 text-blue-800'
+                                ];
+                                $metodo_iconos = [
+                                    'Tarjeta' => 'fa-credit-card',
+                                    'Efectivo' => 'fa-money-bill',
+                                    'Transferencia' => 'fa-exchange-alt'
+                                ];
+                                $clase = $metodo_clases[$gasto['Metodo']] ?? 'bg-gray-100 text-gray-800';
+                                $icono = $metodo_iconos[$gasto['Metodo']] ?? 'fa-question';
+                                ?>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $clase; ?>">
+                                    <i class="fas <?php echo $icono; ?> mr-1"></i>
                                     <?php echo $gasto['Metodo']; ?>
                                 </span>
                                 <span class="ml-2 text-sm text-gray-600">
@@ -246,9 +262,22 @@ $balance = $total_pagos - $total_gastos;
                     <?php foreach ($pagos_por_metodo as $pago): ?>
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                    <?php echo $pago['Metodo'] === 'Tarjeta' ? 'bg-indigo-100 text-indigo-800' : 'bg-green-100 text-green-800'; ?>">
-                                    <i class="fas <?php echo $pago['Metodo'] === 'Tarjeta' ? 'fa-credit-card' : 'fa-money-bill'; ?> mr-1"></i>
+                                <?php 
+                                $metodo_clases = [
+                                    'Tarjeta' => 'bg-indigo-100 text-indigo-800',
+                                    'Efectivo' => 'bg-green-100 text-green-800',
+                                    'Transferencia' => 'bg-blue-100 text-blue-800'
+                                ];
+                                $metodo_iconos = [
+                                    'Tarjeta' => 'fa-credit-card',
+                                    'Efectivo' => 'fa-money-bill',
+                                    'Transferencia' => 'fa-exchange-alt'
+                                ];
+                                $clase = $metodo_clases[$pago['Metodo']] ?? 'bg-gray-100 text-gray-800';
+                                $icono = $metodo_iconos[$pago['Metodo']] ?? 'fa-question';
+                                ?>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $clase; ?>">
+                                    <i class="fas <?php echo $icono; ?> mr-1"></i>
                                     <?php echo $pago['Metodo']; ?>
                                 </span>
                                 <span class="ml-2 text-sm text-gray-600">

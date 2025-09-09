@@ -9,12 +9,12 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 $host = 'localhost';
-$usuario = 'kallijag_stage';
-$clave = 'uNtiL.horSe@5';
-$baseDeDatos = 'kallijag_pos_stage'; // Nombre correcto de la base de datos
-
+$usuario = 'root';
+$clave = 'root';
+$puerto = 8889;
+$baseDeDatos = 'GastosApp';
 try {
-    $conexion = new mysqli($host, $usuario, $clave, $baseDeDatos);
+    $conexion = new mysqli($host, $usuario, $clave, $baseDeDatos, $puerto);
     
     if ($conexion->connect_error) {
         die("Conexión fallida: " . $conexion->connect_error);
