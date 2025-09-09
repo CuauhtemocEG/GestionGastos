@@ -76,5 +76,5 @@ $router->addRoute('add-pago', 'pages/add-pago.php', 'Agregar Pago');
 $router->addRoute('dashboard', 'pages/dashboard.php', 'Dashboard Avanzado');
 $router->addRoute('analytics', 'pages/analytics.php', 'Analytics Inteligente');
 $router->addRoute('configuracion', 'pages/configuracion.php', 'Configuración');
-
+$router->addRoute('admin-usuarios', 'pages/admin-usuarios.php', 'Administración de Usuarios');
 ?>
