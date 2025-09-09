@@ -5,7 +5,6 @@ include 'router.php';
 
 // Incluir el layout principal
 include 'includes/layout.php';
-?>
 
 // Funciones para compatibilidad con el código existente
 function obtenerGastos($conexion, $fechaInicio, $fechaFin)
