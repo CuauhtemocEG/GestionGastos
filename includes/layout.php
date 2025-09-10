@@ -105,7 +105,7 @@ if (!isset($metodoFiltro)) $metodoFiltro = $_GET['metodo'] ?? 'todos';
 
 <body class="bg-gray-50 font-sans antialiased">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg border-b border-gray-200">
+    <nav class="bg-white shadow-lg border-b border-gray-200" x-data="{ mobileMenuOpen: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <!-- Logo y nombre -->
@@ -203,11 +203,69 @@ if (!isset($metodoFiltro)) $metodoFiltro = $_GET['metodo'] ?? 'todos';
 
                 <!-- Mobile menu button -->
                 <div class="sm:hidden flex items-center">
-                    <button type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500 transition" aria-label="Abrir menú">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button type="button" @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500 transition" aria-label="Abrir menú">
+                        <svg x-show="!mobileMenuOpen" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
+                        <svg x-show="mobileMenuOpen" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div class="sm:hidden">
+            <div x-show="mobileMenuOpen" x-transition @click.away="mobileMenuOpen = false" class="bg-white border-t border-gray-200">
+                <div class="pt-2 pb-3 space-y-1">
+                    <a href="?page=home" @click="mobileMenuOpen = false" class="<?= $router->getCurrentPath() === 'home' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' ?> block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                        Inicio
+                    </a>
+                    <a href="?page=dashboard" @click="mobileMenuOpen = false" class="<?= $router->getCurrentPath() === 'dashboard' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' ?> block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                        Dashboard
+                    </a>
+                    <a href="?page=gastos" @click="mobileMenuOpen = false" class="<?= $router->getCurrentPath() === 'gastos' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' ?> block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                        Gastos
+                    </a>
+                    <a href="?page=pagos" @click="mobileMenuOpen = false" class="<?= $router->getCurrentPath() === 'pagos' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' ?> block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                        Pagos
+                    </a>
+                    <a href="?page=resumen" @click="mobileMenuOpen = false" class="<?= $router->getCurrentPath() === 'resumen' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' ?> block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                        Resumen
+                    </a>
+                    <a href="?page=analytics" @click="mobileMenuOpen = false" class="<?= $router->getCurrentPath() === 'analytics' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' ?> block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                        Analytics
+                    </a>
+                    <?php 
+                    $is_admin = (isset($_SESSION['username']) && $_SESSION['username'] === 'admin') || 
+                               (isset($_SESSION['email']) && $_SESSION['email'] === 'admin@gastosapp.com');
+                    if ($is_admin): ?>
+                    <a href="?page=admin-usuarios" @click="mobileMenuOpen = false" class="<?= $router->getCurrentPath() === 'admin-usuarios' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' ?> block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                        Admin Usuarios
+                    </a>
+                    <?php endif; ?>
+                </div>
+                <div class="pt-4 pb-3 border-t border-gray-200">
+                    <div class="flex items-center px-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                                <span class="text-white text-sm font-medium"><?= strtoupper(substr($_SESSION['nombre_completo'] ?? 'U', 0, 1)) ?></span>
+                            </div>
+                        </div>
+                        <div class="ml-3">
+                            <div class="text-base font-medium text-gray-800"><?= htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario') ?></div>
+                            <div class="text-sm font-medium text-gray-500"><?= htmlspecialchars($_SESSION['email'] ?? '') ?></div>
+                        </div>
+                    </div>
+                    <div class="mt-3 space-y-1">
+                        <a href="?page=configuracion" @click="mobileMenuOpen = false" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+                            Configuración
+                        </a>
+                        <a href="?logout=1" @click="mobileMenuOpen = false" class="block px-4 py-2 text-base font-medium text-red-600 hover:text-red-800 hover:bg-red-50">
+                            Cerrar Sesión
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -238,7 +296,6 @@ if (!isset($metodoFiltro)) $metodoFiltro = $_GET['metodo'] ?? 'todos';
 </html>
 
 <script>
-    // Función para mostrar notificaciones
     function showNotification(message, type = 'success') {
         const notification = document.createElement('div');
         notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 ${

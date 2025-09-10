@@ -873,20 +873,4 @@ function exportToPDF() {
     params.set('page', 'home');
     window.open('includes/exportar.php?' + params.toString(), '_blank');
 }
-
-// Script para alertas de gastos inteligentes
-setTimeout(() => {
-    const totalGastos = <?= $stats_gastos['total_monto_gastos'] ?? 0 ?>;
-    const balance = <?= $balance ?>;
-    
-    if (totalGastos > 50000) {
-        if (confirm('⚠️ Gastos altos detectados!\n\nEl total de gastos ($' + totalGastos.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ') supera el umbral recomendado.\n\n¿Deseas ver un análisis detallado?')) {
-            window.location.href = '?page=resumen&analisis=alto';
-        }
-    } else if (balance < -10000) {
-        if (confirm('💰 Balance negativo detectado!\n\nTus gastos superan significativamente tus ingresos.\n\n¿Deseas revisar estrategias de ahorro?')) {
-            window.location.href = '?page=resumen&balance=negativo';
-        }
-    }
-}, 3000);
 </script>
