@@ -8,23 +8,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fecha = $_POST['fecha'];
     $metodo = $_POST['metodo'];
     
-    if (!empty($descripcion) && $monto > 0 && !empty($fecha) && !empty($metodo)) {
-        $stmt = $conexion->prepare("INSERT INTO Pagos (descripcion, monto, fecha, Metodo) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param('sdss', $descripcion, $monto, $fecha, $metodo);
-        
-        if ($stmt->execute()) {
-            $mensaje = 'Pago agregado exitosamente';
-            $tipo_mensaje = 'success';
-            // Limpiar formulario
-            $descripcion = $monto = $fecha = $metodo = '';
-        } else {
-            $mensaje = 'Error al agregar el pago: ' . $conexion->error;
-            $tipo_mensaje = 'error';
-        }
-        $stmt->close();
-    } else {
-        $mensaje = 'Por favor, complete todos los campos correctamente';
+    // Validaciones mejoradas
+    if (empty($descripcion)) {
+        $mensaje = 'La descripción es requerida';
         $tipo_mensaje = 'error';
+    } elseif ($monto <= 0) {
+        $mensaje = 'El monto debe ser mayor a 0';
+        $tipo_mensaje = 'error';
+    } elseif (empty($fecha)) {
+        $mensaje = 'La fecha es requerida';
+        $tipo_mensaje = 'error';
+    } elseif (empty($metodo)) {
+        $mensaje = 'El método de pago es requerido';
+        $tipo_mensaje = 'error';
+    } else {
+        try {
+            // Verificar conexión a base de datos
+            if (!isset($conexion) || !$conexion) {
+                throw new Exception('No hay conexión a la base de datos');
+            }
+            
+            // Verificar el estado del AUTO_INCREMENT para tabla Pagos
+            $check_autoincrement = $conexion->query("SHOW TABLE STATUS LIKE 'Pagos'");
+            $table_info = $check_autoincrement->fetch_assoc();
+            $current_autoincrement = $table_info['Auto_increment'] ?? 0;
+            
+            // Si AUTO_INCREMENT es 0 o null, configurarlo correctamente
+            if ($current_autoincrement <= 0) {
+                $max_id_result = $conexion->query("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM Pagos WHERE id > 0");
+                $max_id_data = $max_id_result->fetch_assoc();
+                $next_id = $max_id_data['next_id'];
+                
+                $conexion->query("ALTER TABLE Pagos AUTO_INCREMENT = $next_id");
+                error_log("AUTO_INCREMENT de Pagos configurado a $next_id");
+            }
+            
+            // Preparar la consulta INSERT
+            $stmt = $conexion->prepare("INSERT INTO Pagos (descripcion, monto, fecha, Metodo) VALUES (?, ?, ?, ?)");
+            
+            if (!$stmt) {
+                throw new Exception('Error al preparar la consulta: ' . $conexion->error);
+            }
+            
+            $stmt->bind_param('sdss', $descripcion, $monto, $fecha, $metodo);
+            
+            if ($stmt->execute()) {
+                $insert_id = $conexion->insert_id;
+                
+                // Verificar que se insertó con un ID válido
+                if ($insert_id > 0) {
+                    $mensaje = "Pago agregado exitosamente con ID: $insert_id";
+                    $tipo_mensaje = 'success';
+                    
+                    // Limpiar formulario
+                    $descripcion = $monto = $fecha = $metodo = '';
+                } else {
+                    // Si el ID es 0, algo está mal con AUTO_INCREMENT
+                    throw new Exception('El pago se insertó pero con ID inválido. Revise la configuración de AUTO_INCREMENT.');
+                }
+            } else {
+                throw new Exception('Error al ejecutar la consulta: ' . $stmt->error);
+            }
+            
+            $stmt->close();
+            
+        } catch (Exception $e) {
+            $mensaje = 'Error al agregar el pago: ' . $e->getMessage();
+            $tipo_mensaje = 'error';
+            error_log("Error en add-pago.php: " . $e->getMessage());
+        }
     }
 }
 ?>
