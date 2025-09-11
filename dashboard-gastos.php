@@ -490,14 +490,31 @@ arsort($gastos_por_metodo);
 
     // Función para abrir modal de edición
     function editarGasto(gasto) {
-        gastoAEditarId = gasto.ID;
+        console.log('Editando gasto:', gasto);
+        
+        // Validar que el gasto tiene un ID válido
+        if (!gasto.ID || gasto.ID == '0' || isNaN(gasto.ID)) {
+            alert('Error: No se puede editar un gasto sin ID válido');
+            return;
+        }
+
+        gastoAEditarId = parseInt(gasto.ID);
 
         document.getElementById('editGastoId').value = gasto.ID;
         document.getElementById('editFecha').value = gasto.Fecha;
-        document.getElementById('editMonto').value = gasto.Monto;
-        document.getElementById('editDescripcion').value = gasto.Descripcion;
-        document.getElementById('editTipo').value = gasto.Tipo;
-        document.getElementById('editMetodo').value = gasto.Metodo;
+        document.getElementById('editMonto').value = parseFloat(gasto.Monto);
+        document.getElementById('editDescripcion').value = gasto.Descripcion || '';
+        document.getElementById('editTipo').value = gasto.Tipo || '';
+        document.getElementById('editMetodo').value = gasto.Metodo || '';
+
+        // Debug - verificar valores asignados
+        console.log('Valores asignados al formulario:');
+        console.log('ID:', document.getElementById('editGastoId').value);
+        console.log('Fecha:', document.getElementById('editFecha').value);
+        console.log('Monto:', document.getElementById('editMonto').value);
+        console.log('Descripción:', document.getElementById('editDescripcion').value);
+        console.log('Tipo:', document.getElementById('editTipo').value);
+        console.log('Método:', document.getElementById('editMetodo').value);
 
         document.getElementById('modalEditarGasto').classList.remove('hidden');
     }
@@ -510,8 +527,16 @@ arsort($gastos_por_metodo);
 
     // Función para confirmar eliminación
     function confirmarEliminarGasto(id, descripcion) {
-        gastoAEliminarId = id;
-        document.getElementById('gastoAEliminar').textContent = descripcion;
+        console.log('Confirmando eliminación del gasto ID:', id);
+        
+        // Validar ID
+        if (!id || id == '0' || isNaN(id)) {
+            alert('Error: ID de gasto inválido para eliminación');
+            return;
+        }
+
+        gastoAEliminarId = parseInt(id);
+        document.getElementById('gastoAEliminar').textContent = descripcion || 'Sin descripción';
         document.getElementById('modalEliminarGasto').classList.remove('hidden');
     }
 
@@ -521,21 +546,54 @@ arsort($gastos_por_metodo);
         gastoAEliminarId = null;
     }
 
+    // Variables para prevenir múltiples envíos
+    let procesandoEdicion = false;
+    let procesandoEliminacion = false;
+
     // Función para procesar edición
     document.getElementById('formEditarGasto').addEventListener('submit', function(e) {
         e.preventDefault();
 
+        // Prevenir múltiples envíos
+        if (procesandoEdicion) {
+            console.log('Ya se está procesando una edición');
+            return;
+        }
+
+        procesandoEdicion = true;
+        
+        // Validar que tenemos un ID válido
+        const gastoId = document.getElementById('editGastoId').value;
+        if (!gastoId || gastoId == '0' || isNaN(gastoId)) {
+            alert('Error: ID de gasto inválido');
+            procesandoEdicion = false;
+            return;
+        }
+
         const formData = new FormData(this);
         formData.append('action', 'edit');
+
+        // Debug - verificar datos que se envían
+        console.log('Enviando datos:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ': ' + value);
+        }
 
         fetch('procesar_gastos.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Respuesta del servidor:', data);
                 if (data.success) {
                     alert('Gasto actualizado exitosamente');
+                    cerrarModalEditar();
                     location.reload();
                 } else {
                     alert('Error: ' + data.message);
@@ -543,26 +601,47 @@ arsort($gastos_por_metodo);
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error al procesar la solicitud');
+                alert('Error al procesar la solicitud: ' + error.message);
+            })
+            .finally(() => {
+                procesandoEdicion = false;
             });
     });
 
     // Función para eliminar gasto
     function eliminarGasto() {
-        if (!gastoAEliminarId) return;
+        if (!gastoAEliminarId || procesandoEliminacion) return;
+
+        procesandoEliminacion = true;
+
+        // Validar ID
+        if (gastoAEliminarId == '0' || isNaN(gastoAEliminarId)) {
+            alert('Error: ID de gasto inválido');
+            procesandoEliminacion = false;
+            return;
+        }
 
         const formData = new FormData();
         formData.append('action', 'delete');
         formData.append('id', gastoAEliminarId);
 
+        console.log('Eliminando gasto con ID:', gastoAEliminarId);
+
         fetch('procesar_gastos.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Respuesta del servidor:', data);
                 if (data.success) {
                     alert('Gasto eliminado exitosamente');
+                    cerrarModalEliminar();
                     location.reload();
                 } else {
                     alert('Error: ' + data.message);
@@ -570,7 +649,10 @@ arsort($gastos_por_metodo);
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error al procesar la solicitud');
+                alert('Error al procesar la solicitud: ' + error.message);
+            })
+            .finally(() => {
+                procesandoEliminacion = false;
             });
     }
 

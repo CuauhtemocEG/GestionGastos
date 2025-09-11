@@ -24,9 +24,13 @@ try {
             $metodo = $_POST['metodo'];
             
             // Debug: Log de los valores recibidos
-            error_log("DEBUG - Valores recibidos: ID=$id, metodo='$metodo', descripcion='$descripcion'");
+            error_log("DEBUG - Valores recibidos: ID=$id, fecha='$fecha', monto=$monto, descripcion='$descripcion', tipo='$tipo', metodo='$metodo'");
             
             // Validaciones
+            if ($id <= 0) {
+                throw new Exception("ID de gasto inválido: $id");
+            }
+            
             if (empty($descripcion)) {
                 throw new Exception('La descripción es requerida');
             }
@@ -44,6 +48,18 @@ try {
             if (!in_array($metodo, $metodos_validos)) {
                 throw new Exception("Método de pago inválido: '$metodo'. Métodos válidos: " . implode(', ', $metodos_validos));
             }
+            
+            // Verificar que el gasto existe antes de actualizar
+            $sql_check = "SELECT ID FROM Gastos WHERE ID = ?";
+            $stmt_check = $conexion->prepare($sql_check);
+            $stmt_check->bind_param('i', $id);
+            $stmt_check->execute();
+            $result = $stmt_check->get_result();
+            
+            if ($result->num_rows === 0) {
+                throw new Exception("El gasto con ID $id no existe");
+            }
+            $stmt_check->close();
             
             // Actualizar en base de datos
             $sql = "UPDATE Gastos SET 
